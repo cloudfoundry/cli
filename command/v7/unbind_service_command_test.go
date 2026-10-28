@@ -209,6 +209,7 @@ var _ = Describe("unbind-service Command", func() {
 					eventStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -225,6 +226,7 @@ var _ = Describe("unbind-service Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Unbinding in progress. Use 'cf service %s' to check operation status\.\n`, fakeServiceInstanceName),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
@@ -296,7 +298,7 @@ var _ = Describe("unbind-service Command", func() {
 			It("waits for the event stream to complete", func() {
 				Expect(testUI.Out).To(SatisfyAll(
 					Say(`Deleting service binding %s\.\.\.\n`, fakeBindingGUID),
-					Say(`Waiting for the operation to complete\.+\n`),
+					Say(`Waiting for the operation to complete\n\.+`),
 					Say(`\n`),
 					Say(`OK\n`),
 				))

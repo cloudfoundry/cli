@@ -142,10 +142,6 @@ func (fake *FakeTargetedOrgRequirement) GetOrganizationFieldsReturnsOnCall(i int
 func (fake *FakeTargetedOrgRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getOrganizationFieldsMutex.RLock()
-	defer fake.getOrganizationFieldsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

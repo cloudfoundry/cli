@@ -56,6 +56,17 @@ var _ = Describe("IsMinimumAPIVersionMet", func() {
 		})
 	})
 
+	Context("current version is empty", func() {
+		BeforeEach(func() {
+			currentVersion = ""
+		})
+
+		It("returns false with no errors", func() {
+			Expect(minAPIVersionMet).To(Equal(false))
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+	})
+
 	Context("current version is less than min", func() {
 		BeforeEach(func() {
 			currentVersion = "3.22.0"

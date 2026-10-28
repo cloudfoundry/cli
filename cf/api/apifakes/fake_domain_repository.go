@@ -699,24 +699,6 @@ func (fake *FakeDomainRepository) ListDomainsForOrgReturnsOnCall(i int, result1 
 func (fake *FakeDomainRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.createSharedDomainMutex.RLock()
-	defer fake.createSharedDomainMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.deleteSharedDomainMutex.RLock()
-	defer fake.deleteSharedDomainMutex.RUnlock()
-	fake.findByNameInOrgMutex.RLock()
-	defer fake.findByNameInOrgMutex.RUnlock()
-	fake.findPrivateByNameMutex.RLock()
-	defer fake.findPrivateByNameMutex.RUnlock()
-	fake.findSharedByNameMutex.RLock()
-	defer fake.findSharedByNameMutex.RUnlock()
-	fake.firstOrDefaultMutex.RLock()
-	defer fake.firstOrDefaultMutex.RUnlock()
-	fake.listDomainsForOrgMutex.RLock()
-	defer fake.listDomainsForOrgMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

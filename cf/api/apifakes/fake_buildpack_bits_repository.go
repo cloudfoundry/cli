@@ -175,10 +175,6 @@ func (fake *FakeBuildpackBitsRepository) UploadBuildpackReturnsOnCall(i int, res
 func (fake *FakeBuildpackBitsRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createBuildpackZipFileMutex.RLock()
-	defer fake.createBuildpackZipFileMutex.RUnlock()
-	fake.uploadBuildpackMutex.RLock()
-	defer fake.uploadBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

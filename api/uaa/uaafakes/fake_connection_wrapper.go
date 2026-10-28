@@ -162,10 +162,6 @@ func (fake *FakeConnectionWrapper) WrapReturnsOnCall(i int, result1 uaa.Connecti
 func (fake *FakeConnectionWrapper) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.makeMutex.RLock()
-	defer fake.makeMutex.RUnlock()
-	fake.wrapMutex.RLock()
-	defer fake.wrapMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -19,6 +19,8 @@ env:
   BOSH_DEPLOYMENT: cf
   BOSH_NON_INTERACTIVE: true
   ENV_NAME: ${{ inputs.env-name }}
+  BBL_CLI_VERSION: ${{ vars.BBL_CLI_VERSION }}
+  BOSH_CLI_VERSION: ${{ vars.BOSH_CLI_VERSION }}
 
 jobs:
   delete-env:
@@ -31,14 +33,12 @@ jobs:
           go version
 
           install_location=/usr/local/bin
-          bbl_version=v9.0.35
-          bosh_cli_artifact=bosh-cli-7.7.2-linux-amd64
-          
-          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/${bbl_version}/bbl-${bbl_version}_linux_amd64 --silent --location --output  $install_location/bbl
+
+          sudo curl https://github.com/cloudfoundry/bosh-bootloader/releases/download/v${BBL_CLI_VERSION}/bbl-v${BBL_CLI_VERSION}_linux_amd64 --silent --location --output $install_location/bbl
           sudo chmod +x $install_location/bbl
           bbl --version
-  
-          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v7.7.2/$bosh_cli_artifact --silent --output $install_location/bosh --location
+
+          sudo curl https://github.com/cloudfoundry/bosh-cli/releases/download/v${BOSH_CLI_VERSION}/bosh-cli-${BOSH_CLI_VERSION}-linux-amd64 --silent --output $install_location/bosh --location
           sudo chmod +x $install_location/bosh
           bosh --version
   
@@ -46,12 +46,12 @@ jobs:
           sudo apt install -y build-essential unzip wamerican
 
       - name: Checkout cli
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: cli
 
       - name: Checkout bosh-bootloader
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: cloudfoundry/bosh-bootloader
           path: bosh-bootloader
@@ -66,17 +66,41 @@ jobs:
 
       - name: Download file from GCS
         run: |
-          gsutil -m cp -P -R gs://cf-cli-bosh-lites/${ENV_NAME} . 
+          gcloud storage cp -r gs://cf-cli-bosh-lites/${ENV_NAME} .
 
       - name: delete bosh
+        id: delete-bosh
+        timeout-minutes: 30
+        continue-on-error: true
         run: |
           cd ${ENV_NAME}/bbl-state
           eval "$(bbl print-env --shell-type posix)"
-          
+
+          # Delete the CF deployment first so warden containers release their
+          # bind mounts on the director's persistent disk. --force makes bosh ignore
+          # per-instance errors (like a busy unmount) and still delete the
+          # deployment record.
+          echo "Deleting CF deployment ${BOSH_DEPLOYMENT}"
+          bosh delete-deployment -d ${BOSH_DEPLOYMENT} --force || true
+
           echo "Deleting env ${ENV_NAME}"
-          echo ${BBL_GCP_SERVICE_ACCOUNT_KEY} > key.json
-          bbl down --no-confirm --gcp-service-account-key=key.json
-        
-      - name: delete gcs bucket
+          bbl down --no-confirm
+
+      - name: force delete env (fallback)
+        if: steps.delete-bosh.outcome == 'failure'
+        timeout-minutes: 15
         run: |
-          gsutil rm -R gs://cf-cli-bosh-lites/${ENV_NAME} 
+          echo "${BBL_GCP_SERVICE_ACCOUNT_KEY}" > /tmp/gcp_key.json
+          export BBL_GCP_SERVICE_ACCOUNT_KEY_PATH=/tmp/gcp_key.json
+          bash ${GITHUB_WORKSPACE}/cli/.github/bosh-lite-files/force-delete-env.sh "${ENV_NAME}"
+          rm -f /tmp/gcp_key.json
+
+      - name: delete gcs bucket
+        if: always()
+        run: |
+          gcloud storage rm -r gs://cf-cli-bosh-lites/${ENV_NAME}
+
+      - name: warn if delete bosh needed the fallback
+        if: steps.delete-bosh.outcome == 'failure'
+        run: |
+          echo "::warning::The graceful 'delete bosh' step failed for ${ENV_NAME} and the environment was torn down via the force-delete-env.sh fallback instead. This usually means an abandoned BOSH task or a warden mount was still busy - see the 'delete bosh' step log for details."

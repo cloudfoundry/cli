@@ -27,6 +27,13 @@ type Process struct {
 	DiskInMB                              types.NullUint64
 	LogRateLimitInBPS                     types.NullInt
 	AppGUID                               string
+	EmbeddedProcessInstances              []EmbeddedProcessInstance
+}
+
+type EmbeddedProcessInstance struct {
+	Index int64  `json:"index"`
+	State string `json:"state"`
+	Since int64  `json:"since"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -39,6 +46,7 @@ func (p Process) MarshalJSON() ([]byte, error) {
 	marshalLogRateLimit(p, &ccProcess)
 	marshalHealthCheck(p, &ccProcess)
 	marshalReadinessHealthCheck(p, &ccProcess)
+	marshalEmbeddedProcessInstances(p, &ccProcess)
 
 	return json.Marshal(ccProcess)
 }
@@ -71,6 +79,8 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 				Interval          int64  `json:"interval"`
 			} `json:"data"`
 		} `json:"readiness_health_check"`
+
+		EmbeddedProcessInstances []EmbeddedProcessInstance `json:"process_instances,omitempty"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccProcess)
@@ -94,6 +104,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	p.LogRateLimitInBPS = ccProcess.LogRateLimitInBPS
 	p.Type = ccProcess.Type
 	p.AppGUID = ccProcess.Relationships[constant.RelationshipTypeApplication].GUID
+	p.EmbeddedProcessInstances = ccProcess.EmbeddedProcessInstances
 
 	return nil
 }
@@ -123,8 +134,9 @@ type marshalProcess struct {
 	DiskInMB          json.Number `json:"disk_in_mb,omitempty"`
 	LogRateLimitInBPS json.Number `json:"log_rate_limit_in_bytes_per_second,omitempty"`
 
-	HealthCheck          *healthCheck          `json:"health_check,omitempty"`
-	ReadinessHealthCheck *readinessHealthCheck `json:"readiness_health_check,omitempty"`
+	HealthCheck              *healthCheck               `json:"health_check,omitempty"`
+	ReadinessHealthCheck     *readinessHealthCheck      `json:"readiness_health_check,omitempty"`
+	EmbeddedProcessInstances []EmbeddedProcessInstance  `json:"process_instances,omitempty"`
 }
 
 func marshalCommand(p Process, ccProcess *marshalProcess) {
@@ -178,5 +190,11 @@ func marshalMemory(p Process, ccProcess *marshalProcess) {
 func marshalLogRateLimit(p Process, ccProcess *marshalProcess) {
 	if p.LogRateLimitInBPS.IsSet {
 		ccProcess.LogRateLimitInBPS = json.Number(fmt.Sprint(p.LogRateLimitInBPS.Value))
+	}
+}
+
+func marshalEmbeddedProcessInstances(p Process, ccProcess *marshalProcess) {
+	if len(p.EmbeddedProcessInstances) > 0 {
+		ccProcess.EmbeddedProcessInstances = p.EmbeddedProcessInstances
 	}
 }

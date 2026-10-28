@@ -1,0 +1,15 @@
+---
+# BOSH DNS recursor fix for Ubuntu Noble on BOSH Lite (GCP).
+# bosh-deployment's dns.yml places the Noble bosh-dns config under the
+# "bosh-dns-systemd" addon (NOT the "bosh-dns" addon, which only covers
+# trusty/xenial/bionic/jammy) with disable_recursors: true. That blocks
+# external DNS resolution (e.g. buildpacks.cloudfoundry.org) inside diego-cell
+# containers, so app staging fails with "lookup ... server misbehaving".
+# Enable recursion and forward to GCP's metadata resolver.
+- type: replace
+  path: /addons/name=bosh-dns-systemd/jobs/name=bosh-dns/properties/disable_recursors
+  value: false
+- type: replace
+  path: /addons/name=bosh-dns-systemd/jobs/name=bosh-dns/properties/recursors?
+  value:
+  - 169.254.169.254

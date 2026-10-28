@@ -453,20 +453,6 @@ func (fake *FakeRepository) RefreshTokenReturnsOnCall(i int, result1 string, res
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.authenticateMutex.RLock()
-	defer fake.authenticateMutex.RUnlock()
-	fake.authorizeMutex.RLock()
-	defer fake.authorizeMutex.RUnlock()
-	fake.dumpRequestMutex.RLock()
-	defer fake.dumpRequestMutex.RUnlock()
-	fake.dumpResponseMutex.RLock()
-	defer fake.dumpResponseMutex.RUnlock()
-	fake.getLoginPromptsAndSaveUAAServerURLMutex.RLock()
-	defer fake.getLoginPromptsAndSaveUAAServerURLMutex.RUnlock()
-	fake.refreshAuthTokenMutex.RLock()
-	defer fake.refreshAuthTokenMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

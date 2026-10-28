@@ -332,7 +332,7 @@ var _ = Describe("bind-service command", func() {
 
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Binding service instance %s to app %s in org %s / space %s as %s\.\.\.\n`, serviceInstanceName, appName, orgName, spaceName, username),
-						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`Waiting for the operation to complete\n\.+`),
 						Say(`\n`),
 						Say(`OK\n`),
 					))

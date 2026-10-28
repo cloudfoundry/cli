@@ -221,6 +221,7 @@ var _ = Describe("bind-route-service Command", func() {
 					eventStream <- v7action.PollJobEvent{
 						State:    v7action.JobPolling,
 						Warnings: v7action.Warnings{"job polling warning"},
+						JobGUID:  "job-guid",
 					}
 				}()
 
@@ -236,6 +237,7 @@ var _ = Describe("bind-route-service Command", func() {
 					Say(`OK\n`),
 					Say(`\n`),
 					Say(`Binding in progress\.\n`),
+					Say(`Job \(job-guid\) is being processed\.\n`),
 				))
 
 				Expect(testUI.Err).To(SatisfyAll(
@@ -304,7 +306,7 @@ var _ = Describe("bind-route-service Command", func() {
 
 			It("waits for the event stream to complete", func() {
 				Expect(testUI.Out).To(SatisfyAll(
-					Say(`Waiting for the operation to complete\.\.\.\n`),
+					Say(`Waiting for the operation to complete\n\.\.\.`),
 					Say(`\n`),
 					Say(`OK\n`),
 				))

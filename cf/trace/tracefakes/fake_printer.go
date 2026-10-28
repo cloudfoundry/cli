@@ -191,14 +191,6 @@ func (fake *FakePrinter) WritesToConsoleReturnsOnCall(i int, result1 bool) {
 func (fake *FakePrinter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.printMutex.RLock()
-	defer fake.printMutex.RUnlock()
-	fake.printfMutex.RLock()
-	defer fake.printfMutex.RUnlock()
-	fake.printlnMutex.RLock()
-	defer fake.printlnMutex.RUnlock()
-	fake.writesToConsoleMutex.RLock()
-	defer fake.writesToConsoleMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

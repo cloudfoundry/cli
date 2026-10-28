@@ -574,20 +574,6 @@ func (fake *FakePlanBuilder) GetPlansVisibleToOrgReturnsOnCall(i int, result1 []
 func (fake *FakePlanBuilder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.attachOrgToPlansMutex.RLock()
-	defer fake.attachOrgToPlansMutex.RUnlock()
-	fake.attachOrgsToPlansMutex.RLock()
-	defer fake.attachOrgsToPlansMutex.RUnlock()
-	fake.getPlansForManyServicesWithOrgsMutex.RLock()
-	defer fake.getPlansForManyServicesWithOrgsMutex.RUnlock()
-	fake.getPlansForServiceMutex.RLock()
-	defer fake.getPlansForServiceMutex.RUnlock()
-	fake.getPlansForServiceForOrgMutex.RLock()
-	defer fake.getPlansForServiceForOrgMutex.RUnlock()
-	fake.getPlansForServiceWithOrgsMutex.RLock()
-	defer fake.getPlansForServiceWithOrgsMutex.RUnlock()
-	fake.getPlansVisibleToOrgMutex.RLock()
-	defer fake.getPlansVisibleToOrgMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

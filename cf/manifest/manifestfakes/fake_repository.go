@@ -92,8 +92,6 @@ func (fake *FakeRepository) ReadManifestReturnsOnCall(i int, result1 *manifest.M
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.readManifestMutex.RLock()
-	defer fake.readManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

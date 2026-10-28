@@ -451,18 +451,6 @@ func (fake *FakeQuotaRepository) UpdateReturnsOnCall(i int, result1 error) {
 func (fake *FakeQuotaRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.assignQuotaToOrgMutex.RLock()
-	defer fake.assignQuotaToOrgMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.findAllMutex.RLock()
-	defer fake.findAllMutex.RUnlock()
-	fake.findByNameMutex.RLock()
-	defer fake.findByNameMutex.RUnlock()
-	fake.updateMutex.RLock()
-	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

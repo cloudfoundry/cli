@@ -126,10 +126,6 @@ func (fake *FakeSimpleProgressBar) TerminateCalls(stub func()) {
 func (fake *FakeSimpleProgressBar) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.initializeMutex.RLock()
-	defer fake.initializeMutex.RUnlock()
-	fake.terminateMutex.RLock()
-	defer fake.terminateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -15,11 +15,12 @@ type LabelUnsetter interface {
 type UnsetLabelCommand struct {
 	BaseCommand
 
-	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
-	relatedCommands interface{}         `related_commands:"labels, set-label"`
-	BuildpackStack  string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	ServiceBroker   string              `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
-	ServiceOffering string              `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
+	RequiredArgs       flag.UnsetLabelArgs `positional-args:"yes"`
+	relatedCommands    interface{}         `related_commands:"labels, set-label"`
+	BuildpackStack     string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	ServiceBroker      string              `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
+	ServiceOffering    string              `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
+	RoutePolicySource  string              `long:"source" description:"Specify a route policy source to disambiguate when a route has multiple policies"`
 
 	LabelUnsetter LabelUnsetter
 }
@@ -47,11 +48,12 @@ func (cmd UnsetLabelCommand) Execute(args []string) error {
 	}
 
 	targetResource := TargetResource{
-		ResourceType:    cmd.RequiredArgs.ResourceType,
-		ResourceName:    cmd.RequiredArgs.ResourceName,
-		BuildpackStack:  cmd.BuildpackStack,
-		ServiceBroker:   cmd.ServiceBroker,
-		ServiceOffering: cmd.ServiceOffering,
+		ResourceType:      cmd.RequiredArgs.ResourceType,
+		ResourceName:      cmd.RequiredArgs.ResourceName,
+		BuildpackStack:    cmd.BuildpackStack,
+		ServiceBroker:     cmd.ServiceBroker,
+		ServiceOffering:   cmd.ServiceOffering,
+		RoutePolicySource: cmd.RoutePolicySource,
 	}
 	return cmd.LabelUnsetter.Execute(targetResource, labels)
 }
@@ -74,6 +76,7 @@ buildpack
 domain
 org
 route
+route-policy
 service-broker
 service-instance
 service-offering

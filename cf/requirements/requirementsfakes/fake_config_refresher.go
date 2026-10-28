@@ -84,8 +84,6 @@ func (fake *FakeConfigRefresher) RefreshReturnsOnCall(i int, result1 coreconfig.
 func (fake *FakeConfigRefresher) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.refreshMutex.RLock()
-	defer fake.refreshMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

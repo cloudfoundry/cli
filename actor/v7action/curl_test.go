@@ -247,5 +247,33 @@ var _ = Describe("Curl Actions", func() {
 				})
 			})
 		})
+
+		When("the request fails before an HTTP response is received", func() {
+			// e.g. a token refresh / authentication failure in the request wrapper, where
+			// no request reaches the API and there is no HTTP response.
+			BeforeEach(func() {
+				mockErr = errors.New("Bad credentials")
+				mockResponseBody = nil
+				mockHTTPResponse = nil
+			})
+
+			It("surfaces the error instead of returning empty output", func() {
+				Expect(executeErr).To(MatchError("Bad credentials"))
+				Expect(responseBody).To(BeNil())
+				Expect(httpResponse).To(BeNil())
+			})
+
+			When("the fail-on-http-errors flag is set", func() {
+				BeforeEach(func() {
+					failOnHTTPError = true
+				})
+
+				It("surfaces the error without panicking on the nil response", func() {
+					Expect(executeErr).To(MatchError("Bad credentials"))
+					Expect(responseBody).To(BeNil())
+					Expect(httpResponse).To(BeNil())
+				})
+			})
+		})
 	})
 })

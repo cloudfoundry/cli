@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
-    "code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/flag"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
@@ -28,7 +28,7 @@ type UpdateBuildpackCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.BuildpackName               `positional-args:"Yes"`
-	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nWhen using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
+	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nWhen using the 'buildpack' lifecycle type, Path should be a zip file, a url to a zip file, or a local directory. When using the 'cnb' lifecycle, Path should be a cnb file or gzipped oci image. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack."`
 	relatedCommands interface{}                      `related_commands:"buildpacks, create-buildpack, delete-buildpack"`
 	NewStack        string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
 	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`

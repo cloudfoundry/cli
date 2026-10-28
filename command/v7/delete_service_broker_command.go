@@ -9,7 +9,7 @@ type DeleteServiceBrokerCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.ServiceBroker `positional-args:"yes"`
-	usage           interface{}        `usage:"CF_NAME delete-service-broker SERVICE_BROKER [-f]\n\n"`
+	usage           interface{}        `usage:"CF_NAME delete-service-broker SERVICE_BROKER [-f]"`
 	Force           bool               `short:"f" description:"Force deletion without confirmation"`
 	relatedCommands interface{}        `related_commands:"delete-service, purge-service-offering, service-brokers"`
 }

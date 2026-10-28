@@ -89,8 +89,6 @@ func (fake *FakeAddPluginRepoActor) AddPluginRepositoryReturnsOnCall(i int, resu
 func (fake *FakeAddPluginRepoActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.addPluginRepositoryMutex.RLock()
-	defer fake.addPluginRepositoryMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

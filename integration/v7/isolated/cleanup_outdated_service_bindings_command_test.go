@@ -308,7 +308,7 @@ var _ = Describe("cleanup-outdated-service-bindings command", func() {
 							Say(`Cleaning up outdated service bindings for app %s in org %s / space %s as %s\.\.\.\n`, appName, orgName, spaceName, username),
 							Say(`Found 1 outdated service binding\.`),
 							Say(`Deleting service binding %s...`, oldServiceBindingGUID),
-							Say(`Waiting for the operation to complete\.+\n`),
+							Say(`Waiting for the operation to complete\n\.+`),
 							Say(`OK\n`),
 						))
 

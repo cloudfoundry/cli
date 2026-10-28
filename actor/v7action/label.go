@@ -178,3 +178,19 @@ func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID str
 
 	return warnings, nil
 }
+
+func (actor *Actor) GetRoutePolicyLabels(routeURL, spaceGUID, source string) (map[string]types.NullString, Warnings, error) {
+	_, metadata, warnings, err := actor.resolveRoutePolicyGUID(routeURL, spaceGUID, source)
+	if err != nil {
+		return nil, warnings, err
+	}
+	return actor.extractLabels(metadata, warnings, nil)
+}
+
+func (actor *Actor) UpdateRoutePolicyLabels(routeURL, spaceGUID, source string, labels map[string]types.NullString) (Warnings, error) {
+	policyGUID, _, warnings, err := actor.resolveRoutePolicyGUID(routeURL, spaceGUID, source)
+	if err != nil {
+		return warnings, err
+	}
+	return actor.updateResourceMetadata("route-policy", policyGUID, resources.Metadata{Labels: labels}, warnings)
+}

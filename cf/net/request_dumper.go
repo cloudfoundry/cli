@@ -138,7 +138,7 @@ func (p RequestDumper) displayFormData(formData url.Values) {
 func (p RequestDumper) DumpResponse(res *http.Response) {
 	dumpedResponse, err := httputil.DumpResponse(res, true)
 	if err != nil {
-		p.printer.Printf(T("Error dumping response\n{{.Err}}\n", map[string]interface{}{"Err": err}))
+		p.printer.Printf("%s", T("Error dumping response\n{{.Err}}\n", map[string]interface{}{"Err": err}))
 	} else {
 		p.printer.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("RESPONSE:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedResponse)))
 	}

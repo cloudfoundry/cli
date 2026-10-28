@@ -42,6 +42,12 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			RequestBody: requestMetadata,
 			URIParams:   internal.Params{"route_guid": resourceGUID},
 		}
+	case "route-policy":
+		params = RequestParams{
+			RequestName: internal.PatchRoutePolicyRequest,
+			RequestBody: requestMetadata,
+			URIParams:   internal.Params{"route_policy_guid": resourceGUID},
+		}
 	case "service-broker":
 		params = RequestParams{
 			RequestName: internal.PatchServiceBrokerRequest,

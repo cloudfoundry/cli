@@ -167,10 +167,6 @@ func (fake *FakeRepository) GetInstancesReturnsOnCall(i int, result1 []models.Ap
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.deleteInstanceMutex.RLock()
-	defer fake.deleteInstanceMutex.RUnlock()
-	fake.getInstancesMutex.RLock()
-	defer fake.getInstancesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

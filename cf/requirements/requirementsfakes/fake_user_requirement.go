@@ -142,10 +142,6 @@ func (fake *FakeUserRequirement) GetUserReturnsOnCall(i int, result1 models.User
 func (fake *FakeUserRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getUserMutex.RLock()
-	defer fake.getUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

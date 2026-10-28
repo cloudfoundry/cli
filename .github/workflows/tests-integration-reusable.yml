@@ -32,20 +32,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout cli
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{inputs.gitRef}}
         fetch-depth: 0
         path: cli
+        # gitRef is only ever populated by tests-integration.yml's get-sha
+        # job, which is gated on OWNER/COLLABORATOR authors or the
+        # safe-to-test label.
+        allow-unsafe-pr-checkout: true
 
     - name: Checkout CF deployment tasks
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: cloudfoundry/cf-deployment-concourse-tasks
         path: cf-deployment-concourse-tasks
 
     - name: Set Up Go
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version-file: cli/go.mod
         check-latest: true

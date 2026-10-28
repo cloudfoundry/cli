@@ -152,12 +152,6 @@ func (fake *FakeTokenCache) SetRefreshTokenArgsForCall(i int) string {
 func (fake *FakeTokenCache) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	fake.setRefreshTokenMutex.RLock()
-	defer fake.setRefreshTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

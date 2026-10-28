@@ -90,8 +90,6 @@ func (fake *FakeUninstallPluginActor) UninstallPluginReturnsOnCall(i int, result
 func (fake *FakeUninstallPluginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.uninstallPluginMutex.RLock()
-	defer fake.uninstallPluginMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

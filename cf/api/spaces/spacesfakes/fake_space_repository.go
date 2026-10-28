@@ -619,22 +619,6 @@ func (fake *FakeSpaceRepository) SetAllowSSHReturnsOnCall(i int, result1 error) 
 func (fake *FakeSpaceRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.findByNameMutex.RLock()
-	defer fake.findByNameMutex.RUnlock()
-	fake.findByNameInOrgMutex.RLock()
-	defer fake.findByNameInOrgMutex.RUnlock()
-	fake.listSpacesMutex.RLock()
-	defer fake.listSpacesMutex.RUnlock()
-	fake.listSpacesFromOrgMutex.RLock()
-	defer fake.listSpacesFromOrgMutex.RUnlock()
-	fake.renameMutex.RLock()
-	defer fake.renameMutex.RUnlock()
-	fake.setAllowSSHMutex.RLock()
-	defer fake.setAllowSSHMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

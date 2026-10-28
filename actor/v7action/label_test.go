@@ -396,6 +396,375 @@ var _ = Describe("labels", func() {
 		})
 	})
 
+	Describe("UpdateRoutePolicyLabels", func() {
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateRoutePolicyLabels("sub.example.com/my-path", "space-guid", "", labels)
+		})
+
+		When("there are no client errors and exactly one policy", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{"get-routes-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{{GUID: "policy-guid", Source: "cf:app:app1-guid"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-policies-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					"", ccv3.Warnings{"set-label-warning"}, nil,
+				)
+			})
+
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("queries GetRoutePolicies with route GUID filter", func() {
+				Expect(fakeCloudControllerClient.GetRoutePoliciesCallCount()).To(Equal(1))
+				queries := fakeCloudControllerClient.GetRoutePoliciesArgsForCall(0)
+				Expect(queries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.RouteGUIDFilter, Values: []string{"route-guid"}},
+				))
+			})
+
+			It("calls UpdateResourceMetadata with the policy GUID", func() {
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, policyGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(resourceType).To(Equal("route-policy"))
+				Expect(policyGUID).To(Equal("policy-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "get-policies-warning", "set-label-warning"))
+			})
+		})
+
+		When("a source is given and it matches a policy", func() {
+			JustBeforeEach(func() {
+				warnings, executeErr = actor.UpdateRoutePolicyLabels("sub.example.com/my-path", "space-guid", "cf:app:app2-guid", labels)
+			})
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "policy-1", Source: "cf:app:app1-guid"},
+						{GUID: "policy-2", Source: "cf:app:app2-guid"},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns("", ccv3.Warnings{}, nil)
+			})
+
+			It("selects the policy matching the given source", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				_, policyGUID, _ := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(policyGUID).To(Equal("policy-2"))
+			})
+		})
+
+		When("no source is given and there are multiple policies", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "policy-1", Source: "cf:app:app1-guid"},
+						{GUID: "policy-2", Source: "cf:app:app2-guid"},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns a RoutePolicyAmbiguityError", func() {
+				Expect(executeErr).To(MatchError(actionerror.RoutePolicyAmbiguityError{
+					RouteURL: "sub.example.com/my-path",
+					Count:    2,
+				}))
+			})
+		})
+
+		When("a source is given but no policy matches", func() {
+			JustBeforeEach(func() {
+				warnings, executeErr = actor.UpdateRoutePolicyLabels("sub.example.com/my-path", "space-guid", "cf:app:unknown-guid", labels)
+			})
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "policy-1", Source: "cf:app:app1-guid"},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns a RoutePolicyNotFoundError", func() {
+				Expect(executeErr).To(MatchError(actionerror.RoutePolicyNotFoundError{Source: "cf:app:unknown-guid"}))
+			})
+		})
+
+		When("fetching the route fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					nil,
+					ccv3.Warnings{"get-domains-warning"},
+					errors.New("get-route-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("get-route-error"))
+				Expect(warnings).To(ConsistOf("get-domains-warning"))
+			})
+		})
+
+		When("fetching route policies fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					nil,
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-policies-warning"},
+					errors.New("get-policies-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("get-policies-error"))
+				Expect(warnings).To(ContainElement("get-policies-warning"))
+			})
+		})
+
+		When("updating the metadata fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{{GUID: "policy-guid", Source: "cf:app:app1-guid"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					"", ccv3.Warnings{"metadata-warning"}, errors.New("update-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("update-error"))
+				Expect(warnings).To(ContainElement("metadata-warning"))
+			})
+		})
+	})
+
+	Describe("GetRoutePolicyLabels", func() {
+		JustBeforeEach(func() {
+			labels, warnings, executeErr = actor.GetRoutePolicyLabels("sub.example.com/my-path", spaceGUID, "")
+		})
+
+		When("there are no client errors and exactly one policy", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{"get-routes-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{{
+						GUID:   "policy-guid",
+						Source: "cf:app:app1-guid",
+						Metadata: &resources.Metadata{
+							Labels: map[string]types.NullString{
+								"key1": types.NewNullString("value1"),
+							},
+						},
+					}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-policies-warning"},
+					nil,
+				)
+			})
+
+			It("returns the labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(labels).To(Equal(map[string]types.NullString{"key1": types.NewNullString("value1")}))
+				Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "get-policies-warning"))
+			})
+		})
+
+		When("the policy has no labels", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{{GUID: "policy-guid", Source: "cf:app:app1-guid"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns an empty map", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(labels).To(BeEmpty())
+			})
+		})
+
+		When("there are multiple policies and no source given", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "policy-1", Source: "cf:app:app1-guid"},
+						{GUID: "policy-2", Source: "cf:app:app2-guid"},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns a RoutePolicyAmbiguityError", func() {
+				Expect(executeErr).To(MatchError(actionerror.RoutePolicyAmbiguityError{
+					RouteURL: "sub.example.com/my-path",
+					Count:    2,
+				}))
+			})
+		})
+
+		When("a source is given and it matches", func() {
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetRoutePolicyLabels("sub.example.com/my-path", spaceGUID, "cf:app:app2-guid")
+			})
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]resources.Domain{{Name: "sub.example.com", GUID: "domain-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]resources.Route{{GUID: "route-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutePoliciesReturns(
+					[]resources.RoutePolicy{
+						{GUID: "policy-1", Source: "cf:app:app1-guid"},
+						{GUID: "policy-2", Source: "cf:app:app2-guid", Metadata: &resources.Metadata{
+							Labels: map[string]types.NullString{"env": types.NewNullString("prod")},
+						}},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns the labels for the matching policy", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(labels).To(Equal(map[string]types.NullString{"env": types.NewNullString("prod")}))
+			})
+		})
+
+		When("there is a client error fetching the route", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					nil,
+					ccv3.Warnings{"get-domains-warning"},
+					errors.New("get-route-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("get-route-error"))
+				Expect(warnings).To(ConsistOf("get-domains-warning"))
+			})
+		})
+	})
+
 	Describe("UpdateSpaceLabelsBySpaceName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateSpaceLabelsBySpaceName(resourceName, orgGUID, labels)

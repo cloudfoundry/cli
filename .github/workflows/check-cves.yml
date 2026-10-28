@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Check out codebase
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Scan current project
       id: scan

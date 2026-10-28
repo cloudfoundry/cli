@@ -94,8 +94,6 @@ func (fake *FakeDownloader) DownloadReturnsOnCall(i int, result1 string, result2
 func (fake *FakeDownloader) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.downloadMutex.RLock()
-	defer fake.downloadMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

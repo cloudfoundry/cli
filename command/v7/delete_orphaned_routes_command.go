@@ -3,7 +3,7 @@ package v7
 type DeleteOrphanedRoutesCommand struct {
 	BaseCommand
 
-	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]\n"`
+	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	relatedCommands interface{} `related_commands:"delete-route, routes"`
 }

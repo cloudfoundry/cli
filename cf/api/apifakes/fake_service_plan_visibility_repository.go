@@ -307,14 +307,6 @@ func (fake *FakeServicePlanVisibilityRepository) SearchReturnsOnCall(i int, resu
 func (fake *FakeServicePlanVisibilityRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.listMutex.RLock()
-	defer fake.listMutex.RUnlock()
-	fake.searchMutex.RLock()
-	defer fake.searchMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

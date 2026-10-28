@@ -29,6 +29,10 @@ const (
 	SequenceIDFilter QueryKey = "sequence_ids"
 	// RouteGUIDFilter is a query parameter for listing objects by Route GUID.
 	RouteGUIDFilter QueryKey = "route_guids"
+	// SourcesFilter is a query parameter for listing route policies by source.
+	SourcesFilter QueryKey = "sources"
+	// SourceGuidsFilter is a query parameter for listing route policies by source GUID.
+	SourceGuidsFilter QueryKey = "source_guids"
 	// ServiceInstanceGUIDFilter is a query parameter for listing objects by Service Instance GUID.
 	ServiceInstanceGUIDFilter QueryKey = "service_instance_guids"
 	// SpaceGUIDFilter is a query parameter for listing objects by Space GUID.
@@ -101,6 +105,8 @@ const (
 	// Include is a query parameter for specifying other resources associated with the
 	// resource returned by the endpoint
 	Include QueryKey = "include"
+	// see https://v3-apidocs.cloudfoundry.org/version/3.212.0/index.html#embed
+	Embed QueryKey = "embed"
 
 	// GloballyEnabledStaging is the query parameter for getting only security groups that are globally enabled for staging
 	GloballyEnabledStaging QueryKey = "globally_enabled_staging"

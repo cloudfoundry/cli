@@ -247,12 +247,6 @@ func (fake *FakeNetworkingClient) RemovePoliciesReturnsOnCall(i int, result1 err
 func (fake *FakeNetworkingClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createPoliciesMutex.RLock()
-	defer fake.createPoliciesMutex.RUnlock()
-	fake.listPoliciesMutex.RLock()
-	defer fake.listPoliciesMutex.RUnlock()
-	fake.removePoliciesMutex.RLock()
-	defer fake.removePoliciesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

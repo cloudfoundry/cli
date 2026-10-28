@@ -146,12 +146,6 @@ func (fake *FakeProgressBar) ReadyCalls(stub func()) {
 func (fake *FakeProgressBar) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.completeMutex.RLock()
-	defer fake.completeMutex.RUnlock()
-	fake.newProgressBarWrapperMutex.RLock()
-	defer fake.newProgressBarWrapperMutex.RUnlock()
-	fake.readyMutex.RLock()
-	defer fake.readyMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

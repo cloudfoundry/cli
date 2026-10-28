@@ -78,8 +78,6 @@ func (fake *FakeWarningProducer) WarningsReturnsOnCall(i int, result1 []string) 
 func (fake *FakeWarningProducer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.warningsMutex.RLock()
-	defer fake.warningsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

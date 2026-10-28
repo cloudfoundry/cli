@@ -94,6 +94,7 @@ var _ = Describe("Process", func() {
 					"ReadinessHealthCheckEndpoint":          Equal("/foo"),
 					"ReadinessHealthCheckInvocationTimeout": BeEquivalentTo(2),
 					"ReadinessHealthCheckInterval":          BeEquivalentTo(9),
+					"EmbeddedProcessInstances":              BeNil(),
 				}))
 			})
 		})
@@ -367,6 +368,7 @@ var _ = Describe("Process", func() {
 					"ReadinessHealthCheckEndpoint":          Equal("/foo"),
 					"ReadinessHealthCheckInvocationTimeout": BeEquivalentTo(2),
 					"ReadinessHealthCheckInterval":          BeEquivalentTo(9),
+					"EmbeddedProcessInstances":              BeNil(),
 				}))
 			})
 		})
@@ -524,32 +526,35 @@ var _ = Describe("Process", func() {
 
 				Expect(processes).To(ConsistOf(
 					resources.Process{
-						GUID:               "process-1-guid",
-						Type:               constant.ProcessTypeWeb,
-						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
-						MemoryInMB:         types.NullUint64{Value: 32, IsSet: true},
-						LogRateLimitInBPS:  types.NullInt{Value: 64, IsSet: true},
-						HealthCheckType:    constant.Port,
-						HealthCheckTimeout: 0,
+						GUID:                     "process-1-guid",
+						Type:                     constant.ProcessTypeWeb,
+						Command:                  types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:               types.NullUint64{Value: 32, IsSet: true},
+						LogRateLimitInBPS:        types.NullInt{Value: 64, IsSet: true},
+						HealthCheckType:          constant.Port,
+						HealthCheckTimeout:       0,
+						EmbeddedProcessInstances: nil,
 					},
 					resources.Process{
-						GUID:                "process-2-guid",
-						Type:                "worker",
-						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
-						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
-						LogRateLimitInBPS:   types.NullInt{Value: 128, IsSet: true},
-						HealthCheckType:     constant.HTTP,
-						HealthCheckEndpoint: "/health",
-						HealthCheckTimeout:  60,
+						GUID:                     "process-2-guid",
+						Type:                     "worker",
+						Command:                  types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:               types.NullUint64{Value: 64, IsSet: true},
+						LogRateLimitInBPS:        types.NullInt{Value: 128, IsSet: true},
+						HealthCheckType:          constant.HTTP,
+						HealthCheckEndpoint:      "/health",
+						HealthCheckTimeout:       60,
+						EmbeddedProcessInstances: nil,
 					},
 					resources.Process{
-						GUID:               "process-3-guid",
-						Type:               "console",
-						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
-						MemoryInMB:         types.NullUint64{Value: 128, IsSet: true},
-						LogRateLimitInBPS:  types.NullInt{Value: 256, IsSet: true},
-						HealthCheckType:    constant.Process,
-						HealthCheckTimeout: 90,
+						GUID:                     "process-3-guid",
+						Type:                     "console",
+						Command:                  types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:               types.NullUint64{Value: 128, IsSet: true},
+						LogRateLimitInBPS:        types.NullInt{Value: 256, IsSet: true},
+						HealthCheckType:          constant.Process,
+						HealthCheckTimeout:       90,
+						EmbeddedProcessInstances: nil,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))

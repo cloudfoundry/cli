@@ -419,16 +419,6 @@ func (fake *FakePushActor) ValidateAppParamsReturnsOnCall(i int, result1 []error
 func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.gatherFilesMutex.RLock()
-	defer fake.gatherFilesMutex.RUnlock()
-	fake.mapManifestRouteMutex.RLock()
-	defer fake.mapManifestRouteMutex.RUnlock()
-	fake.processPathMutex.RLock()
-	defer fake.processPathMutex.RUnlock()
-	fake.uploadAppMutex.RLock()
-	defer fake.uploadAppMutex.RUnlock()
-	fake.validateAppParamsMutex.RLock()
-	defer fake.validateAppParamsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

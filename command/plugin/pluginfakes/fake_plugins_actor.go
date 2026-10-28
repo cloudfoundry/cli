@@ -84,8 +84,6 @@ func (fake *FakePluginsActor) GetOutdatedPluginsReturnsOnCall(i int, result1 []p
 func (fake *FakePluginsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getOutdatedPluginsMutex.RLock()
-	defer fake.getOutdatedPluginsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

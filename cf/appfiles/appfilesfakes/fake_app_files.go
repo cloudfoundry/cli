@@ -320,14 +320,6 @@ func (fake *FakeAppFiles) WalkAppFilesReturnsOnCall(i int, result1 error) {
 func (fake *FakeAppFiles) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.appFilesInDirMutex.RLock()
-	defer fake.appFilesInDirMutex.RUnlock()
-	fake.copyFilesMutex.RLock()
-	defer fake.copyFilesMutex.RUnlock()
-	fake.countFilesMutex.RLock()
-	defer fake.countFilesMutex.RUnlock()
-	fake.walkAppFilesMutex.RLock()
-	defer fake.walkAppFilesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

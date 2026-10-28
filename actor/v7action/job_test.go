@@ -81,16 +81,19 @@ var _ = Describe("Job Actions", func() {
 						State:    constant.JobProcessing,
 						Err:      nil,
 						Warnings: ccv3.Warnings{"foo"},
+						JobGUID:  "job-guid",
 					}
 					fakeStream <- ccv3.PollJobEvent{
 						State:    constant.JobPolling,
 						Err:      nil,
 						Warnings: ccv3.Warnings{"bar"},
+						JobGUID:  "job-guid",
 					}
 					fakeStream <- ccv3.PollJobEvent{
 						State:    constant.JobFailed,
 						Err:      errors.New("bad thing"),
 						Warnings: ccv3.Warnings{"baz"},
+						JobGUID:  "job-guid",
 					}
 					close(fakeStream)
 				}()
@@ -105,16 +108,19 @@ var _ = Describe("Job Actions", func() {
 				State:    JobProcessing,
 				Err:      nil,
 				Warnings: Warnings{"foo"},
+				JobGUID:  "job-guid",
 			})))
 			Eventually(stream).Should(Receive(Equal(PollJobEvent{
 				State:    JobPolling,
 				Err:      nil,
 				Warnings: Warnings{"bar"},
+				JobGUID:  "job-guid",
 			})))
 			Eventually(stream).Should(Receive(Equal(PollJobEvent{
 				State:    JobFailed,
 				Err:      errors.New("bad thing"),
 				Warnings: Warnings{"baz"},
+				JobGUID:  "job-guid",
 			})))
 			Eventually(stream).Should(BeClosed())
 		})

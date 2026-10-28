@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
 	"code.cloudfoundry.org/cli/v8/command/flag"
+	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 )
 
 type DeleteCommand struct {
@@ -56,7 +57,7 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		"Username":  currentUser.Name,
 	})
 
-	warnings, err := cmd.Actor.DeleteApplicationByNameAndSpace(
+	stream, warnings, err := cmd.Actor.DeleteApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.DeleteMappedRoutes,
@@ -68,6 +69,8 @@ func (cmd DeleteCommand) Execute(args []string) error {
 			cmd.UI.DisplayWarning("App '{{.AppName}}' does not exist.", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
+			cmd.UI.DisplayOK()
+			return nil
 		case actionerror.RouteBoundToMultipleAppsError:
 			cmd.UI.DeferText(
 				"\nTIP: Run 'cf delete {{.AppName}}' to delete the app and 'cf delete-route' to delete the route.",
@@ -79,6 +82,10 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		default:
 			return err
 		}
+	}
+
+	if _, err := shared.WaitForResult(stream, cmd.UI, true); err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayOK()

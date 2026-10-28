@@ -95,8 +95,6 @@ func (fake *FakeActorReloader) ReloadReturnsOnCall(i int, result1 v7.Actor, resu
 func (fake *FakeActorReloader) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.reloadMutex.RLock()
-	defer fake.reloadMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

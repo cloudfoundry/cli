@@ -99,8 +99,6 @@ func (fake *FakeStagingWatcher) WatchStagingReturnsOnCall(i int, result1 models.
 func (fake *FakeStagingWatcher) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.watchStagingMutex.RLock()
-	defer fake.watchStagingMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

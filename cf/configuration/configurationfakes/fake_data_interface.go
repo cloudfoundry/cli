@@ -160,10 +160,6 @@ func (fake *FakeDataInterface) JSONUnmarshalV3ReturnsOnCall(i int, result1 error
 func (fake *FakeDataInterface) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.jSONMarshalV3Mutex.RLock()
-	defer fake.jSONMarshalV3Mutex.RUnlock()
-	fake.jSONUnmarshalV3Mutex.RLock()
-	defer fake.jSONUnmarshalV3Mutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

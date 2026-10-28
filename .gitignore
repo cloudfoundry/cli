@@ -26,6 +26,7 @@ _testmain.go
 # Built binaries
 *.exe
 /cli
+/cf/cli
 
 out/
 release/*

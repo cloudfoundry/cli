@@ -1,0 +1,25 @@
+---
+# Raise inotify limits on the BOSH Lite director VM (the host running every
+# warden container). On Ubuntu Noble each warden container runs systemd as PID 1
+# (start_containers_with_systemd), a heavy inotify consumer, so the host's
+# default fs.inotify.max_user_instances (128) is exhausted. App Envoy sidecars
+# then abort with "assert failure: inotify_fd_ >= 0" (Exit status 134), which
+# marks every app instance CRASHED even though staging succeeds.
+#
+# inotify limits are enforced at the host root user namespace (a new userns
+# defaults to unlimited and inc_ucount checks every ancestor up to root), so
+# this MUST be set on the director VM, NOT on the diego-cell.
+#
+# The os-conf release is already declared by bosh-deployment's bosh-lite.yml
+# (which create-director-override.sh applies before this file, for its
+# disable_agent job), so we only add the sysctl job here. Re-declaring the
+# release fails with "releases[N].name 'os-conf' must be unique".
+- type: replace
+  path: /instance_groups/name=bosh/jobs/-
+  value:
+    name: sysctl
+    release: os-conf
+    properties:
+      sysctl:
+      - fs.inotify.max_user_instances=1024
+      - fs.inotify.max_user_watches=524288

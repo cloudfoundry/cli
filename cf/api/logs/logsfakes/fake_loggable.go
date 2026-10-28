@@ -214,12 +214,6 @@ func (fake *FakeLoggable) ToSimpleLogReturnsOnCall(i int, result1 string) {
 func (fake *FakeLoggable) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getSourceNameMutex.RLock()
-	defer fake.getSourceNameMutex.RUnlock()
-	fake.toLogMutex.RLock()
-	defer fake.toLogMutex.RUnlock()
-	fake.toSimpleLogMutex.RLock()
-	defer fake.toSimpleLogMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

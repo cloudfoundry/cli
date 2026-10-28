@@ -161,10 +161,6 @@ func (fake *FakeRoutingClient) GetRouterGroupsReturnsOnCall(i int, result1 []rou
 func (fake *FakeRoutingClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getRouterGroupByNameMutex.RLock()
-	defer fake.getRouterGroupByNameMutex.RUnlock()
-	fake.getRouterGroupsMutex.RLock()
-	defer fake.getRouterGroupsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

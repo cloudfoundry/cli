@@ -30,7 +30,7 @@ func NewLogger(writer io.Writer, verbose bool, boolsOrPaths ...string) Printer {
 			if err == nil {
 				printers = append(printers, NewWriterPrinter(file, false))
 			} else {
-				stdoutLogger.Printf(T("CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+				stdoutLogger.Print(T("CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
 					map[string]interface{}{"Path": path, "Err": err}))
 
 				LoggingToStdout = true

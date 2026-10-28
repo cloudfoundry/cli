@@ -84,8 +84,6 @@ func (fake *FakeServiceSummaryRepository) GetSummariesInCurrentSpaceReturnsOnCal
 func (fake *FakeServiceSummaryRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getSummariesInCurrentSpaceMutex.RLock()
-	defer fake.getSummariesInCurrentSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

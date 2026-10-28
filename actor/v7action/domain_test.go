@@ -112,17 +112,21 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("CreateSharedDomain", func() {
 		var (
-			warnings    Warnings
-			executeErr  error
-			routerGroup string
+			warnings      Warnings
+			executeErr    error
+			routerGroup   string
+			enforceRules  bool
+			scope         string
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateSharedDomain("the-domain-name", true, routerGroup)
+			warnings, executeErr = actor.CreateSharedDomain("the-domain-name", true, routerGroup, enforceRules, scope)
 		})
 
 		BeforeEach(func() {
 			routerGroup = ""
+			enforceRules = false
+			scope = ""
 			fakeCloudControllerClient.CreateDomainReturns(resources.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
 		})
 
@@ -170,11 +174,40 @@ var _ = Describe("Domain Actions", func() {
 				))
 			})
 		})
+
+		Context("when enforce route policies is enabled with a scope", func() {
+			BeforeEach(func() {
+				enforceRules = true
+				scope = "org"
+				fakeCloudControllerClient.CreateDomainReturns(resources.Domain{}, ccv3.Warnings{"create-warning-1"}, nil)
+			})
+
+			It("passes EnforceRoutePolicies and RoutePoliciesScope to the client", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.CreateDomainCallCount()).To(Equal(1))
+				passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
+				Expect(passedDomain.EnforceRoutePolicies).To(Equal(types.NullBool{IsSet: true, Value: true}))
+				Expect(passedDomain.RoutePoliciesScope).To(Equal("org"))
+			})
+		})
 	})
 
 	Describe("CreatePrivateDomain", func() {
+		var (
+			warnings     Warnings
+			executeErr   error
+			enforceRules bool
+			scope        string
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.CreatePrivateDomain("private-domain-name", "org-name", enforceRules, scope)
+		})
 
 		BeforeEach(func() {
+			enforceRules = false
+			scope = ""
 			fakeCloudControllerClient.GetOrganizationsReturns(
 				[]resources.Organization{
 					{GUID: "org-guid"},
@@ -191,7 +224,6 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		It("delegates to the cloud controller client", func() {
-			warnings, executeErr := actor.CreatePrivateDomain("private-domain-name", "org-name")
 			Expect(executeErr).To(MatchError("create-error"))
 			Expect(warnings).To(ConsistOf("get-orgs-warning", "create-warning-1", "create-warning-2"))
 
@@ -204,6 +236,23 @@ var _ = Describe("Domain Actions", func() {
 					OrganizationGUID: "org-guid",
 				},
 			))
+		})
+
+		Context("when enforce route policies is enabled with a scope", func() {
+			BeforeEach(func() {
+				enforceRules = true
+				scope = "org"
+				fakeCloudControllerClient.CreateDomainReturns(resources.Domain{}, ccv3.Warnings{"create-warning-1"}, nil)
+			})
+
+			It("passes EnforceRoutePolicies and RoutePoliciesScope to the client", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.CreateDomainCallCount()).To(Equal(1))
+				passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
+				Expect(passedDomain.EnforceRoutePolicies).To(Equal(types.NullBool{IsSet: true, Value: true}))
+				Expect(passedDomain.RoutePoliciesScope).To(Equal("org"))
+			})
 		})
 	})
 

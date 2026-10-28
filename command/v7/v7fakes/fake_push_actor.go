@@ -338,14 +338,6 @@ func (fake *FakePushActor) HandleFlagOverridesReturnsOnCall(i int, result1 manif
 func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.actualizeMutex.RLock()
-	defer fake.actualizeMutex.RUnlock()
-	fake.createPushPlansMutex.RLock()
-	defer fake.createPushPlansMutex.RUnlock()
-	fake.handleDeploymentScaleFlagOverridesMutex.RLock()
-	defer fake.handleDeploymentScaleFlagOverridesMutex.RUnlock()
-	fake.handleFlagOverridesMutex.RLock()
-	defer fake.handleFlagOverridesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

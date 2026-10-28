@@ -172,8 +172,7 @@ var _ = Describe("delete-service command", func() {
 					Expect(session.Out).To(SatisfyAll(
 						Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 						Say("\n"),
-						Say("Waiting for the operation to complete."),
-						Say("\n"),
+						Say(`Waiting for the operation to complete\n\.`),
 						Say("Service instance %s deleted.\n", serviceInstanceName),
 					))
 
@@ -218,8 +217,7 @@ var _ = Describe("delete-service command", func() {
 					Expect(session.Out).To(SatisfyAll(
 						Say("Deleting service instance %s in org %s / space %s as %s...", serviceInstanceName, orgName, spaceName, username),
 						Say("\n"),
-						Say("Waiting for the operation to complete."),
-						Say("\n"),
+						Say(`Waiting for the operation to complete\n\.`),
 						Say("Service instance %s deleted.\n", serviceInstanceName),
 					))
 

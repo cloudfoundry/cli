@@ -425,18 +425,6 @@ func (fake *FakeStarter) SetStartTimeoutInSecondsArgsForCall(i int) int {
 func (fake *FakeStarter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.applicationStartMutex.RLock()
-	defer fake.applicationStartMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.metaDataMutex.RLock()
-	defer fake.metaDataMutex.RUnlock()
-	fake.requirementsMutex.RLock()
-	defer fake.requirementsMutex.RUnlock()
-	fake.setDependencyMutex.RLock()
-	defer fake.setDependencyMutex.RUnlock()
-	fake.setStartTimeoutInSecondsMutex.RLock()
-	defer fake.setStartTimeoutInSecondsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

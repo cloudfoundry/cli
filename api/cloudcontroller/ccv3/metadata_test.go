@@ -40,9 +40,9 @@ var _ = Describe("Metadata", func() {
 			executeErr       error
 		)
 		testForResourceType := func(resourceType string, resourceTypeNameForURI string) {
-			if resourceTypeNameForURI == "" {
-				resourceTypeNameForURI = resourceType
-			}
+		if resourceTypeNameForURI == "" {
+			resourceTypeNameForURI = resourceType + "s"
+		}
 
 			When(fmt.Sprintf("updating metadata on %s", resourceType), func() {
 
@@ -63,15 +63,15 @@ var _ = Describe("Metadata", func() {
 						}
 
 						server.AppendHandlers(
-							CombineHandlers(
-								VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/%ss/some-guid", resourceTypeNameForURI)),
-								VerifyJSONRepresenting(expectedBody),
-								RespondWith(http.StatusOK, nil, http.Header{
-									"X-Cf-Warnings": {"this is a warning"},
-									"Location":      {"fake-job-url"},
-								}),
-							),
-						)
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/%s/some-guid", resourceTypeNameForURI)),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusOK, nil, http.Header{
+								"X-Cf-Warnings": {"this is a warning"},
+								"Location":      {"fake-job-url"},
+							}),
+						),
+					)
 
 						metadataToUpdate = Metadata{
 							Labels: map[string]types.NullString{
@@ -100,13 +100,13 @@ var _ = Describe("Metadata", func() {
 							},
 						}
 
-						server.AppendHandlers(
-							CombineHandlers(
-								VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/%ss/some-guid", resourceTypeNameForURI)),
-								VerifyJSONRepresenting(expectedBody),
-								RespondWith(http.StatusUnprocessableEntity, errorResponse, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
-							),
-						)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/%s/some-guid", resourceTypeNameForURI)),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusUnprocessableEntity, errorResponse, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+						),
+					)
 
 						metadataToUpdate = Metadata{
 							Labels: map[string]types.NullString{
@@ -126,19 +126,20 @@ var _ = Describe("Metadata", func() {
 			})
 		}
 
-		testForResourceType("app", "")
-		testForResourceType("domain", "")
-		testForResourceType("buildpack", "")
-		testForResourceType("org", "organization")
-		testForResourceType("route", "")
-		testForResourceType("service-broker", "service_broker")
-		testForResourceType("service-instance", "service_instance")
-		testForResourceType("service-offering", "service_offering")
-		testForResourceType("service-plan", "service_plan")
-		testForResourceType("space", "")
-		testForResourceType("stack", "")
+	testForResourceType("app", "")
+	testForResourceType("domain", "")
+	testForResourceType("buildpack", "")
+	testForResourceType("org", "organizations")
+	testForResourceType("route", "")
+	testForResourceType("service-broker", "service_brokers")
+	testForResourceType("service-instance", "service_instances")
+	testForResourceType("service-offering", "service_offerings")
+	testForResourceType("service-plan", "service_plans")
+	testForResourceType("space", "")
+	testForResourceType("stack", "")
+	testForResourceType("route-policy", "route_policies")
 
-		When("updating metadata on an unsupported resource", func() {
+	When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {
 				_, _, err := client.UpdateResourceMetadata("anything", "fake-guid", Metadata{})
 				Expect(err).To(MatchError("unknown resource type (anything) requested"))

@@ -218,7 +218,7 @@ var _ = Describe("unbind-service command", func() {
 
 					Expect(session.Out).To(SatisfyAll(
 						Say(`Unbinding app %s from service %s in org %s / space %s as %s\.\.\.\n`, appName, serviceInstanceName, orgName, spaceName, username),
-						Say(`Waiting for the operation to complete\.+\n`),
+						Say(`Waiting for the operation to complete\n\.+`),
 						Say(`\n`),
 						Say(`OK\n`),
 					))

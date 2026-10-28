@@ -180,10 +180,6 @@ func (fake *FakeRepository) UploadBitsReturnsOnCall(i int, result1 error) {
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationFilesMutex.RLock()
-	defer fake.getApplicationFilesMutex.RUnlock()
-	fake.uploadBitsMutex.RLock()
-	defer fake.uploadBitsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

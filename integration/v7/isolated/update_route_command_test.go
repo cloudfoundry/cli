@@ -31,6 +31,8 @@ var _ = Describe("update-route command", func() {
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=round-robin`))
 			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=least-connection`))
+			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=hash -o hash_header=My-Hash-Header`))
+			Eventually(session).Should(Say(`cf update-route example.com -o loadbalancing=hash -o hash_header=My-Hash-Header -o hash_balance=1.3`))
 			Eventually(session).Should(Say(`cf update-route example.com -r loadbalancing`))
 			Eventually(session).Should(Say(`cf update-route example.com --hostname myhost --path foo -o loadbalancing=round-robin`))
 			Eventually(session).Should(Say(`\n`))
@@ -102,7 +104,7 @@ var _ = Describe("update-route command", func() {
 				AfterEach(func() {
 					domain.Delete()
 				})
-				When("a route option is specified", func() {
+				When("a loadbalancing route option is specified", func() {
 					It("updates the route and runs to completion without failing", func() {
 						option = "loadbalancing=round-robin"
 						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", option)
@@ -110,6 +112,45 @@ var _ = Describe("update-route command", func() {
 						Eventually(session).Should(Say(`Route %s\.%s%s has been updated`, hostname, domainName, path))
 						Eventually(session).Should(Say(`OK`))
 						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("a hash-based routing is enabled and options are specified", func() {
+					BeforeEach(func() {
+						helpers.EnableFeatureFlag("hash_based_routing")
+					})
+					AfterEach(func() {
+						helpers.DisableFeatureFlag("hash_based_routing")
+					})
+
+					It("updates the route and runs to completion without failing", func() {
+						optionLBAlgo := "loadbalancing=hash"
+						optionHashHeader := "hash_header=X-Header"
+						optionHashBalance := "hash_balance=1.3"
+						session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", optionLBAlgo, "--option", optionHashHeader, "--option", optionHashBalance)
+						Eventually(session).Should(Say(`Updating route %s\.%s%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Route %s\.%s%s has been updated`, hostname, domainName, path))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
+					Context("missing required options for hash-based routing", func() {
+						It("update fails", func() {
+							optionLBAlgo := "loadbalancing=hash"
+							session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", optionLBAlgo)
+							Eventually(session.Err).Should(Say(`Hash header must be present when loadbalancing is set to hash`))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+					Context("with wrong loadbalancing option", func() {
+						It("update fails", func() {
+							optionLBAlgo := "loadbalancing=round-robin"
+							optionHashHeader := "hash_header=X-Header"
+							optionHashBalance := "hash_balance=1.3"
+							session := helpers.CF("update-route", domainName, "--hostname", hostname, "--path", path, "--option", optionLBAlgo, "--option", optionHashHeader, "--option", optionHashBalance)
+							Eventually(session.Err).Should(Say(`Options Hash header can only be set when loadbalancing is hash`))
+							Eventually(session.Err).Should(Say(`Options Hash balance can only be set when loadbalancing is hash`))
+							Eventually(session).Should(Exit(1))
+						})
 					})
 				})
 

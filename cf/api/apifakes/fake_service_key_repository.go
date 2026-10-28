@@ -320,14 +320,6 @@ func (fake *FakeServiceKeyRepository) ListServiceKeysReturnsOnCall(i int, result
 func (fake *FakeServiceKeyRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createServiceKeyMutex.RLock()
-	defer fake.createServiceKeyMutex.RUnlock()
-	fake.deleteServiceKeyMutex.RLock()
-	defer fake.deleteServiceKeyMutex.RUnlock()
-	fake.getServiceKeyMutex.RLock()
-	defer fake.getServiceKeyMutex.RUnlock()
-	fake.listServiceKeysMutex.RLock()
-	defer fake.listServiceKeysMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

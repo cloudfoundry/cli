@@ -99,8 +99,6 @@ func (fake *FakePluginRepo) GetPluginsReturnsOnCall(i int, result1 map[string][]
 func (fake *FakePluginRepo) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getPluginsMutex.RLock()
-	defer fake.getPluginsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

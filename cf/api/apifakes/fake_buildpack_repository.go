@@ -553,20 +553,6 @@ func (fake *FakeBuildpackRepository) UpdateReturnsOnCall(i int, result1 models.B
 func (fake *FakeBuildpackRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.findByNameMutex.RLock()
-	defer fake.findByNameMutex.RUnlock()
-	fake.findByNameAndStackMutex.RLock()
-	defer fake.findByNameAndStackMutex.RUnlock()
-	fake.findByNameWithNilStackMutex.RLock()
-	defer fake.findByNameWithNilStackMutex.RUnlock()
-	fake.listBuildpacksMutex.RLock()
-	defer fake.listBuildpacksMutex.RUnlock()
-	fake.updateMutex.RLock()
-	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

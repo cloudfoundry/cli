@@ -241,12 +241,6 @@ func (fake *FakeUserProvidedServiceInstanceRepository) UpdateReturnsOnCall(i int
 func (fake *FakeUserProvidedServiceInstanceRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createMutex.RLock()
-	defer fake.createMutex.RUnlock()
-	fake.getSummariesMutex.RLock()
-	defer fake.getSummariesMutex.RUnlock()
-	fake.updateMutex.RLock()
-	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -8,12 +8,17 @@ import (
 )
 
 func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, error) {
+	completed, _, err := WaitForResultWithJobGUID(stream, ui, waitForCompletion)
+	return completed, err
+}
+
+func WaitForResultWithJobGUID(stream chan v7action.PollJobEvent, ui command.UI, waitForCompletion bool) (bool, string, error) {
 	if stream == nil {
-		return true, nil
+		return true, "", nil
 	}
 
 	if waitForCompletion {
-		fmt.Fprint(ui.Writer(), "Waiting for the operation to complete")
+		fmt.Fprintln(ui.Writer(), "Waiting for the operation to complete")
 
 		defer func() {
 			ui.DisplayNewline()
@@ -21,18 +26,45 @@ func WaitForResult(stream chan v7action.PollJobEvent, ui command.UI, waitForComp
 		}()
 	}
 
+	var jobGUID string
+	seen := map[string]bool{}
 	for event := range stream {
-		ui.DisplayWarnings(event.Warnings)
+		ui.DisplayWarnings(dedupeSeenWarnings(event.Warnings, seen))
+		if event.JobGUID != "" {
+			jobGUID = event.JobGUID
+		}
 		if waitForCompletion {
 			fmt.Fprint(ui.Writer(), ".")
 		}
 		if event.Err != nil {
-			return false, event.Err
+			return false, jobGUID, event.Err
 		}
 		if event.State == v7action.JobPolling && !waitForCompletion {
-			return false, nil
+			return false, jobGUID, nil
 		}
 	}
 
-	return true, nil
+	return true, jobGUID, nil
+}
+
+func DisplayJobHint(ui command.UI, jobGUID string) {
+	if jobGUID == "" {
+		return
+	}
+	ui.DisplayText("Job ({{.JobGUID}}) is being processed.", map[string]interface{}{"JobGUID": jobGUID})
+}
+
+// dedupeSeenWarnings prints each distinct warning at most once per operation:
+// CC re-sends warnings like "still in progress" on every poll tick.
+func dedupeSeenWarnings(warnings v7action.Warnings, seen map[string]bool) v7action.Warnings {
+	var deduped v7action.Warnings
+	for _, warning := range warnings {
+		if seen[warning] {
+			continue
+		}
+		seen[warning] = true
+		deduped = append(deduped, warning)
+	}
+
+	return deduped
 }

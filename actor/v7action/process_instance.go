@@ -12,6 +12,14 @@ import (
 
 type ProcessInstance ccv3.ProcessInstance
 
+func NewProcessInstance(index int64, state constant.ProcessInstanceState, uptime time.Duration) ProcessInstance {
+	return ProcessInstance(ccv3.ProcessInstance{
+		Index:  index,
+		State:  state,
+		Uptime: uptime,
+	})
+}
+
 // Running will return true if the instance is running.
 func (instance ProcessInstance) Running() bool {
 	return instance.State == constant.ProcessInstanceRunning

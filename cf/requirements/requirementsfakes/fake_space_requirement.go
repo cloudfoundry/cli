@@ -179,12 +179,6 @@ func (fake *FakeSpaceRequirement) SetSpaceNameArgsForCall(i int) string {
 func (fake *FakeSpaceRequirement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.executeMutex.RLock()
-	defer fake.executeMutex.RUnlock()
-	fake.getSpaceMutex.RLock()
-	defer fake.getSpaceMutex.RUnlock()
-	fake.setSpaceNameMutex.RLock()
-	defer fake.setSpaceNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

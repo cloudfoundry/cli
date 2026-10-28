@@ -150,6 +150,7 @@ type PollJobEvent struct {
 	State    constant.JobState
 	Err      error
 	Warnings Warnings
+	JobGUID  string
 }
 
 func (client *Client) PollJobToEventStream(jobURL JobURL) chan PollJobEvent {
@@ -170,6 +171,7 @@ func (client *Client) PollJobToEventStream(jobURL JobURL) chan PollJobEvent {
 				State:    job.State,
 				Err:      err,
 				Warnings: warnings,
+				JobGUID:  job.GUID,
 			}
 
 			switch {

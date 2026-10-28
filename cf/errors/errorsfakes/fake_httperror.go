@@ -204,12 +204,6 @@ func (fake *FakeHTTPError) StatusCodeReturnsOnCall(i int, result1 int) {
 func (fake *FakeHTTPError) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.errorMutex.RLock()
-	defer fake.errorMutex.RUnlock()
-	fake.errorCodeMutex.RLock()
-	defer fake.errorCodeMutex.RUnlock()
-	fake.statusCodeMutex.RLock()
-	defer fake.statusCodeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

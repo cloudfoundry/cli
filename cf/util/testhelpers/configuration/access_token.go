@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 
 	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
 )
@@ -24,22 +23,22 @@ func EncodeAccessToken(tokenInfo coreconfig.TokenInfo) (accessToken string, err 
 
 // BuildTokenString builds a minimal JWT with the given time as expiration claim.
 func BuildTokenString(expiration time.Time) string {
-	c := jws.Claims{}
-	c.SetExpiration(expiration)
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, _ := token.Serialize(nil)
+	claims := jwtv5.MapClaims{"exp": jwtv5.NewNumericDate(expiration)}
+	token := jwtv5.NewWithClaims(jwtv5.SigningMethodNone, claims)
+	tokenBytes, _ := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
 	return string(tokenBytes)
 }
 
 // BuildTokenStringWithUserInfo builds a JWT with user information for testing.
 func BuildTokenStringWithUserInfo(userGUID, username, email, origin string) string {
-	c := jws.Claims{}
-	c.SetExpiration(time.Now().Add(24 * time.Hour))
-	c.Set("user_id", userGUID)
-	c.Set("user_name", username)
-	c.Set("email", email)
-	c.Set("origin", origin)
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, _ := token.Serialize(nil)
-	return "BEARER " + string(tokenBytes)
+	claims := jwtv5.MapClaims{
+		"exp":       jwtv5.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		"user_id":   userGUID,
+		"user_name": username,
+		"email":     email,
+		"origin":    origin,
+	}
+	token := jwtv5.NewWithClaims(jwtv5.SigningMethodNone, claims)
+	tokenString, _ := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
+	return "bearer " + tokenString
 }

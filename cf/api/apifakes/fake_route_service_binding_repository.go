@@ -169,10 +169,6 @@ func (fake *FakeRouteServiceBindingRepository) UnbindReturnsOnCall(i int, result
 func (fake *FakeRouteServiceBindingRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.bindMutex.RLock()
-	defer fake.bindMutex.RUnlock()
-	fake.unbindMutex.RLock()
-	defer fake.unbindMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

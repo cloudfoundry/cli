@@ -313,14 +313,6 @@ func (fake *FakeZipper) ZipReturnsOnCall(i int, result1 error) {
 func (fake *FakeZipper) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getZipSizeMutex.RLock()
-	defer fake.getZipSizeMutex.RUnlock()
-	fake.isZipFileMutex.RLock()
-	defer fake.isZipFileMutex.RUnlock()
-	fake.unzipMutex.RLock()
-	defer fake.unzipMutex.RUnlock()
-	fake.zipMutex.RLock()
-	defer fake.zipMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

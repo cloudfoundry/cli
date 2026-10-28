@@ -90,8 +90,6 @@ func (fake *FakeProgressBar) NewProgressBarWrapperReturnsOnCall(i int, result1 i
 func (fake *FakeProgressBar) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.newProgressBarWrapperMutex.RLock()
-	defer fake.newProgressBarWrapperMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

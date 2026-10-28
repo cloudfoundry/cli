@@ -97,8 +97,6 @@ func (fake *FakeServiceActor) FilterBrokersReturnsOnCall(i int, result1 []models
 func (fake *FakeServiceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.filterBrokersMutex.RLock()
-	defer fake.filterBrokersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

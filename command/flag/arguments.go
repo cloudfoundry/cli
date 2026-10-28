@@ -413,3 +413,7 @@ type TaskArgs struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	TaskID  int    `positional-arg-name:"TASK_ID" required:"true" description:"The Task ID for the application"`
 }
+
+type RoutePolicyArgs struct {
+	Domain string `positional-arg-name:"DOMAIN" required:"true" description:"The domain"`
+}

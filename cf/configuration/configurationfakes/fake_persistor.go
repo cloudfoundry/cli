@@ -250,14 +250,6 @@ func (fake *FakePersistor) SaveReturnsOnCall(i int, result1 error) {
 func (fake *FakePersistor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.deleteMutex.RLock()
-	defer fake.deleteMutex.RUnlock()
-	fake.existsMutex.RLock()
-	defer fake.existsMutex.RUnlock()
-	fake.loadMutex.RLock()
-	defer fake.loadMutex.RUnlock()
-	fake.saveMutex.RLock()
-	defer fake.saveMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

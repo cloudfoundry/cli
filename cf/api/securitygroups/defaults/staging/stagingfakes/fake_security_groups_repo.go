@@ -228,12 +228,6 @@ func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSetReturnsOnCall(i int, res
 func (fake *FakeSecurityGroupsRepo) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.bindToStagingSetMutex.RLock()
-	defer fake.bindToStagingSetMutex.RUnlock()
-	fake.listMutex.RLock()
-	defer fake.listMutex.RUnlock()
-	fake.unbindFromStagingSetMutex.RLock()
-	defer fake.unbindFromStagingSetMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
