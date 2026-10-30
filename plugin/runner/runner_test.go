@@ -15,9 +15,14 @@ var _ = Describe("PluginRunner", func() {
 		commandUI *ui.UI
 		plugin    configv3.Plugin
 		out       *Buffer
+		cfHome    string
 	)
 
 	BeforeEach(func() {
+		// Run writes the config on exit; never touch the developer's real ~/.cf
+		cfHome = GinkgoT().TempDir()
+		GinkgoT().Setenv("CF_HOME", cfHome)
+
 		out = NewBuffer()
 		commandUI = ui.NewTestUI(nil, out, NewBuffer())
 
@@ -131,6 +136,23 @@ var _ = Describe("PluginRunner", func() {
 			It("still launches the plugin binary instead of failing on the missing target", func() {
 				err := pluginRunner.Run([]string{"test-command"})
 				Expect(err).To(Equal(runner.ErrFailed))
+			})
+		})
+
+		Context("when the plugin exits", func() {
+			BeforeEach(func() {
+				config.ConfigFile.ConfigVersion = configv3.CurrentConfigVersion
+				config.ConfigFile.AccessToken = "bearer token-refreshed-during-plugin-run"
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+			})
+
+			It("writes the config, even when the plugin fails", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(Equal(runner.ErrFailed))
+
+				persisted, err := configv3.LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer token-refreshed-during-plugin-run"))
 			})
 		})
 

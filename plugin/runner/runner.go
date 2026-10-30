@@ -84,6 +84,13 @@ func (r *pluginRunner) Run(args []string) error {
 	if err != nil {
 		return fmt.Errorf("error starting RPC service: %w", err)
 	}
+	// Like core commands, persist the config once the plugin is done, so tokens
+	// refreshed by any RPC call survive. Deferred first, so it runs after Stop.
+	defer func() {
+		if writeErr := r.config.WriteConfig(); writeErr != nil {
+			fmt.Fprintf(os.Stderr, "Error writing config: %s", writeErr.Error())
+		}
+	}()
 	defer rpcService.Stop()
 
 	// Find matching command in plugin and normalize to command name (not alias)

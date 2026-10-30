@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/rpc"
 	"os"
+	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -1142,14 +1143,23 @@ var _ = Describe("Server", func() {
 				var (
 					fakeUAAClient *v7actionfakes.FakeUAAClient
 					actor         *v7action.Actor
+					tokenConfig   *configv3.Config
+					cfHome        string
 				)
 
 				BeforeEach(func() {
-					// Create v3config for RPC service
-					v3config := testconfig.NewConfigWithDefaults()
-					v3config.ConfigFile.AccessToken = "bearer old-access-token"
-					v3config.ConfigFile.RefreshToken = "old-refresh-token"
+					// WriteConfig must never touch the developer's real ~/.cf
+					cfHome = GinkgoT().TempDir()
+					GinkgoT().Setenv("CF_HOME", cfHome)
 
+					tokenConfig = testconfig.NewConfigWithDefaults()
+					// LoadConfig ignores files with any other version, as a real config never has one.
+					tokenConfig.ConfigFile.ConfigVersion = configv3.CurrentConfigVersion
+					tokenConfig.ConfigFile.AccessToken = "bearer old-access-token"
+					tokenConfig.ConfigFile.RefreshToken = "old-refresh-token"
+				})
+
+				JustBeforeEach(func() {
 					// Create fake dependencies for actor
 					fakeCloudControllerClient := new(v7actionfakes.FakeCloudControllerClient)
 					fakeSharedActor := new(v7actionfakes.FakeSharedActor)
@@ -1158,13 +1168,52 @@ var _ = Describe("Server", func() {
 					fakeClock := fakeclock.NewFakeClock(time.Now())
 
 					// Create actor with fakes
-					actor = v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
+					actor = v7action.NewActor(fakeCloudControllerClient, tokenConfig, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-					rpcService, err = NewRpcService(v3config, rpc.DefaultServer, actor, nil, nil)
+					rpcService, err = NewRpcService(tokenConfig, rpc.DefaultServer, actor, nil, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 
 					pingCli(rpcService.Port())
+				})
+
+				It("persists the refreshed tokens to the config file", func() {
+					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+						AccessToken:  "new-access-token",
+						RefreshToken: "new-refresh-token",
+						Type:         "bearer",
+					}, nil)
+
+					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+					Expect(err).ToNot(HaveOccurred())
+
+					var result string
+					err = client.Call("CliRpcCmd.AccessToken", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+
+					persisted, err := configv3.LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer new-access-token"))
+					Expect(persisted.ConfigFile.RefreshToken).To(Equal("new-refresh-token"))
+				})
+
+				When("the token is still valid", func() {
+					BeforeEach(func() {
+						tokenConfig.ConfigFile.AccessToken = "bearer " + testconfig.BuildTokenString(time.Now().Add(time.Hour))
+					})
+
+					It("does not refresh or write the config file", func() {
+						client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+						Expect(err).ToNot(HaveOccurred())
+
+						var result string
+						err = client.Call("CliRpcCmd.AccessToken", "", &result)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(result).To(Equal(tokenConfig.ConfigFile.AccessToken))
+
+						Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
+						Expect(filepath.Join(cfHome, ".cf", "config.json")).ToNot(BeAnExistingFile())
+					})
 				})
 
 				It("refreshes the token", func() {

@@ -335,12 +335,23 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 		return nil
 	}
 
+	accessTokenBefore := cmd.cliConfig.AccessToken()
+	refreshTokenBefore := cmd.cliConfig.RefreshToken()
+
 	token, err := cmd.actor.RefreshAccessToken()
 	if err != nil {
 		return err
 	}
 
 	*retVal = token
+
+	// Persist right away: with refresh-token rotation, the token stored on disk
+	// would otherwise become invalid for long-running plugins which could refresh the access token during execution
+	if cmd.cliConfig.AccessToken() != accessTokenBefore || cmd.cliConfig.RefreshToken() != refreshTokenBefore {
+		if err := cmd.cliConfig.WriteConfig(); err != nil {
+			return fmt.Errorf("persisting refreshed token: %w", err)
+		}
+	}
 
 	return nil
 }
