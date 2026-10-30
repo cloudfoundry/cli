@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -24,6 +25,12 @@ import (
 )
 
 var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
+
+var (
+	ErrNoAPISet                 = errors.New("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint.")
+	ErrActorUnavailable         = errors.New("Cloud Controller access is not available in this context")
+	ErrCommandParserUnavailable = errors.New("core commands cannot be called in this context")
+)
 
 type CliRpcService struct {
 	listener net.Listener
@@ -159,6 +166,11 @@ func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
+	if cmd.commandParser == nil {
+		*retVal = false
+		return ErrCommandParserUnavailable
+	}
+
 	cmd.outputBucket = &bytes.Buffer{}
 	stdout := &OutputInterceptor{
 		capturedOutput: cmd.outputBucket,
@@ -199,6 +211,16 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	v := strings.TrimSuffix(cmd.outputBucket.String(), "\n")
 	*retVal = strings.Split(v, "\n")
 	return nil
+}
+
+func (cmd *CliRpcCmd) getActor() (*v7action.Actor, error) {
+	if cmd.actor != nil {
+		return cmd.actor, nil
+	}
+	if cmd.cliConfig == nil || cmd.cliConfig.Target() == "" {
+		return nil, ErrNoAPISet
+	}
+	return nil, ErrActorUnavailable
 }
 
 // displayWarnings displays warning messages using commandUI
@@ -311,6 +333,11 @@ func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+	if cmd.actor == nil {
+		*retVal = cmd.cliConfig.AccessToken()
+		return nil
+	}
+
 	token, err := cmd.actor.RefreshAccessToken()
 	if err != nil {
 		return err
@@ -322,13 +349,18 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
 	if spaceGUID == "" {
 		return fmt.Errorf("no space targeted")
 	}
 
 	// Get detailed app summary
-	summary, warnings, err := cmd.actor.GetDetailedAppSummary(appName, spaceGUID, false)
+	summary, warnings, err := actor.GetDetailedAppSummary(appName, spaceGUID, false)
 	if err != nil {
 		return err
 	}
@@ -336,7 +368,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	cmd.displayWarnings(warnings)
 
 	// Get service bindings for the app
-	serviceBindings, ccWarnings, err := cmd.actor.CloudControllerClient.GetServiceCredentialBindings(
+	serviceBindings, ccWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{summary.GUID}},
 	)
 	cmd.displayWarnings(ccWarnings)
@@ -347,7 +379,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	// Get stack information
 	var stack resources.Stack
 	if summary.CurrentDroplet.Stack != "" {
-		stacks, ccWarnings, err := cmd.actor.CloudControllerClient.GetStacks(
+		stacks, ccWarnings, err := actor.CloudControllerClient.GetStacks(
 			ccv3.Query{Key: ccv3.NameFilter, Values: []string{summary.CurrentDroplet.Stack}},
 		)
 		cmd.displayWarnings(ccWarnings)
@@ -365,13 +397,18 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
 	if spaceGUID == "" {
 		return fmt.Errorf("no space targeted")
 	}
 
 	// Get app summaries for the space (omitStats=false to get instances)
-	summaries, warnings, err := cmd.actor.GetAppSummariesForSpace(spaceGUID, "", false)
+	summaries, warnings, err := actor.GetAppSummariesForSpace(spaceGUID, "", false)
 	if err != nil {
 		return err
 	}
@@ -385,7 +422,12 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
-	orgs, warnings, err := cmd.actor.GetOrganizations("")
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
+	orgs, warnings, err := actor.GetOrganizations("")
 	if err != nil {
 		return err
 	}
@@ -398,12 +440,17 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
 	if orgGUID == "" {
 		return fmt.Errorf("no organization targeted")
 	}
 
-	spaces, warnings, err := cmd.actor.GetOrganizationSpaces(orgGUID)
+	spaces, warnings, err := actor.GetOrganizationSpaces(orgGUID)
 	if err != nil {
 		return err
 	}
@@ -416,12 +463,17 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
 	if spaceGUID == "" {
 		return fmt.Errorf("no space targeted")
 	}
 
-	services, warnings, err := cmd.actor.GetServiceInstancesForSpace(spaceGUID, false)
+	services, warnings, err := actor.GetServiceInstancesForSpace(spaceGUID, false)
 	if err != nil {
 		return err
 	}
@@ -434,13 +486,18 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	if len(args) == 0 {
 		return fmt.Errorf("organization name required")
 	}
 	orgName := args[0]
 
 	// Get org GUID from name
-	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	org, warnings, err := actor.GetOrganizationByName(orgName)
 	if err != nil {
 		return err
 	}
@@ -449,7 +506,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 	cmd.displayWarnings(warnings)
 
 	// Get users by role type
-	usersByRole, warnings, err := cmd.actor.GetOrgUsersByRoleType(org.GUID)
+	usersByRole, warnings, err := actor.GetOrgUsersByRoleType(org.GUID)
 	if err != nil {
 		return err
 	}
@@ -462,6 +519,11 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	if len(args) < 2 {
 		return fmt.Errorf("organization and space names required")
 	}
@@ -469,7 +531,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 	spaceName := args[1]
 
 	// Get org GUID from name
-	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	org, warnings, err := actor.GetOrganizationByName(orgName)
 	if err != nil {
 		return err
 	}
@@ -478,7 +540,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 	cmd.displayWarnings(warnings)
 
 	// Get space GUID from name
-	space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
 	if err != nil {
 		return err
 	}
@@ -487,7 +549,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 	cmd.displayWarnings(warnings)
 
 	// Get users by role type
-	usersByRole, warnings, err := cmd.actor.GetSpaceUsersByRoleType(space.GUID)
+	usersByRole, warnings, err := actor.GetSpaceUsersByRoleType(space.GUID)
 	if err != nil {
 		return err
 	}
@@ -500,8 +562,13 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	// 1. Get the organization by name
-	org, warnings, err := cmd.actor.GetOrganizationByName(orgName)
+	org, warnings, err := actor.GetOrganizationByName(orgName)
 	if err != nil {
 		return err
 	}
@@ -512,7 +579,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 	var quota resources.OrganizationQuota
 	if org.QuotaGUID != "" {
 		var ccv3Warnings ccv3.Warnings
-		quota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+		quota, ccv3Warnings, err = actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
 		if err != nil {
 			return err
 		}
@@ -520,21 +587,21 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 	}
 
 	// 3. Get organization spaces
-	spaces, warnings, err := cmd.actor.GetOrganizationSpaces(org.GUID)
+	spaces, warnings, err := actor.GetOrganizationSpaces(org.GUID)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 4. Get organization domains
-	domains, warnings, err := cmd.actor.GetOrganizationDomains(org.GUID, "")
+	domains, warnings, err := actor.GetOrganizationDomains(org.GUID, "")
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 5. Get space quotas for the organization
-	spaceQuotas, warnings, err := cmd.actor.GetSpaceQuotasByOrgGUID(org.GUID)
+	spaceQuotas, warnings, err := actor.GetSpaceQuotasByOrgGUID(org.GUID)
 	if err != nil {
 		return err
 	}
@@ -546,6 +613,11 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	// Get the targeted organization GUID
 	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
 	if orgGUID == "" {
@@ -553,35 +625,35 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	}
 
 	// 1. Get the space by name and organization
-	space, warnings, err := cmd.actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 2. Get organization info
-	org, warnings, err := cmd.actor.GetOrganizationByGUID(orgGUID)
+	org, warnings, err := actor.GetOrganizationByGUID(orgGUID)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 3. Get applications in the space
-	apps, warnings, err := cmd.actor.GetApplicationsBySpace(space.GUID)
+	apps, warnings, err := actor.GetApplicationsBySpace(space.GUID)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 4. Get service instances in the space
-	serviceInstances, warnings, err := cmd.actor.GetServiceInstancesForSpace(space.GUID, false)
+	serviceInstances, warnings, err := actor.GetServiceInstancesForSpace(space.GUID, false)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(warnings)
 
 	// 5. Get domains for the organization (spaces inherit org domains)
-	domains, warnings, err := cmd.actor.GetOrganizationDomains(orgGUID, "")
+	domains, warnings, err := actor.GetOrganizationDomains(orgGUID, "")
 	if err != nil {
 		return err
 	}
@@ -591,7 +663,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	var spaceQuota resources.SpaceQuota
 	if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
 		var ccv3Warnings ccv3.Warnings
-		spaceQuota, ccv3Warnings, err = cmd.actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		spaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
 		if err != nil {
 			return err
 		}
@@ -601,14 +673,14 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	// 7. Get security groups (both running and staging)
 	var allSecurityGroups []resources.SecurityGroup
 
-	runningSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
 	if err != nil {
 		return err
 	}
 	cmd.displayWarnings(ccv3Warnings)
 	allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
 
-	stagingSecurityGroups, ccv3Warnings, err := cmd.actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
 	if err != nil {
 		return err
 	}
@@ -629,6 +701,11 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 }
 
 func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_models.GetService_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
+
 	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
 	if spaceGUID == "" {
 		return fmt.Errorf("no space targeted")
@@ -640,7 +717,7 @@ func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_mode
 		{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"name", "guid", "documentation_url"}},
 	}
 
-	serviceInstance, includedResources, warnings, err := cmd.actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
+	serviceInstance, includedResources, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
 		serviceInstanceName,
 		spaceGUID,
 		queries...,

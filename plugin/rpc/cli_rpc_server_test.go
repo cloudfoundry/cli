@@ -282,6 +282,71 @@ var _ = Describe("Server", func() {
 		})
 	})
 
+	Describe("without an actor or command parser", func() {
+		var v3config *configv3.Config
+
+		BeforeEach(func() {
+			v3config = testconfig.NewConfigWithDefaults()
+		})
+
+		JustBeforeEach(func() {
+			rpcService, err = NewRpcService(v3config, rpc.DefaultServer, nil, nil, nil)
+			Expect(err).ToNot(HaveOccurred())
+
+			err := rpcService.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			pingCli(rpcService.Port())
+
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			rpcService.Stop()
+
+			// give time for server to stop
+			time.Sleep(50 * time.Millisecond)
+		})
+
+		It("AccessToken returns the access token stored in the config", func() {
+			var token string
+			err := client.Call("CliRpcCmd.AccessToken", "", &token)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(token).To(Equal(v3config.ConfigFile.AccessToken))
+		})
+
+		When("no API endpoint is targeted", func() {
+			BeforeEach(func() {
+				v3config.ConfigFile.Target = ""
+			})
+
+			It("GetApps returns ErrNoAPISet", func() {
+				var apps []plugin_models.GetAppsModel
+				err := client.Call("CliRpcCmd.GetApps", "", &apps)
+				Expect(err).To(MatchError(ErrNoAPISet.Error()))
+			})
+		})
+
+		When("an API endpoint is targeted", func() {
+			BeforeEach(func() {
+				v3config.ConfigFile.Target = "https://api.example.com"
+			})
+
+			It("GetApps returns ErrActorUnavailable", func() {
+				var apps []plugin_models.GetAppsModel
+				err := client.Call("CliRpcCmd.GetApps", "", &apps)
+				Expect(err).To(MatchError(ErrActorUnavailable.Error()))
+			})
+		})
+
+		It("CallCoreCommand returns ErrCommandParserUnavailable", func() {
+			var ok bool
+			err := client.Call("CliRpcCmd.CallCoreCommand", []string{"apps"}, &ok)
+			Expect(err).To(MatchError(ErrCommandParserUnavailable.Error()))
+		})
+	})
+
 	Describe("Plugin API", func() {
 		var (
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient

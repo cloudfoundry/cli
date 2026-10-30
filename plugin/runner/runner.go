@@ -69,20 +69,15 @@ func (r *pluginRunner) Run(args []string) error {
 	deps := commandregistry.NewDependency(writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
 	defer deps.Config.Close()
 
-	// Initialize v7 actor
+	// Without a target the plugin still runs. RPC calls that need Cloud
+	// Controller return rpc.ErrNoAPISet.
 	var actor *v7action.Actor
-	if r.commandUI != nil {
-		// Initialize shared actor
-		sharedActor := sharedaction.NewActor(r.config)
-
-		// Get clients and connect to CF
+	if r.commandUI != nil && r.config.Target() != "" {
 		ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(r.config, r.commandUI, "")
 		if err != nil {
 			return fmt.Errorf("error connecting to CF: %w", err)
 		}
-
-		// Initialize v7 actor
-		actor = v7action.NewActor(ccClient, r.config, sharedActor, uaaClient, routingClient, clock.NewClock())
+		actor = v7action.NewActor(ccClient, r.config, sharedaction.NewActor(r.config), uaaClient, routingClient, clock.NewClock())
 	}
 
 	// Initialize RPC server

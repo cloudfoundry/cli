@@ -122,6 +122,18 @@ var _ = Describe("PluginRunner", func() {
 			})
 		})
 
+		Context("when no API endpoint is targeted", func() {
+			BeforeEach(func() {
+				config.ConfigFile.Target = ""
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+			})
+
+			It("still launches the plugin binary instead of failing on the missing target", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(Equal(runner.ErrFailed))
+			})
+		})
+
 		// Note: Integration tests with actual plugin binaries would require:
 		// 1. A test plugin binary to be compiled
 		// 2. Proper RPC communication setup
