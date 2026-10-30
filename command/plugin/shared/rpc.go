@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"time"
 
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
@@ -30,12 +28,6 @@ type RPCService struct {
 }
 
 func NewRPCService(config Config, ui UI) (*RPCService, error) {
-	isVerbose, logFiles := config.Verbose()
-	traceLogger := trace.NewLogger(ui.Writer(), isVerbose, logFiles...)
-
-	deps := commandregistry.NewDependency(ui.Writer(), traceLogger, fmt.Sprint(config.DialTimeout().Seconds()))
-	defer deps.Config.Close()
-
 	// Load configv3.Config for RPC service
 	v3Config, err := configv3.LoadConfig()
 	if err != nil {

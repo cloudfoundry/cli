@@ -7,7 +7,6 @@ import (
 	"io"
 	"net"
 	"net/rpc"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,8 +22,6 @@ import (
 	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
 )
-
-var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
 
 var (
 	ErrNoAPISet                 = errors.New("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint.")

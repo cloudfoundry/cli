@@ -3,15 +3,12 @@ package runner
 import (
 	"errors"
 	"fmt"
-	"io"
 	netrpc "net/rpc"
 	"os"
 	"os/exec"
 
 	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/command/translatableerror"
 	"code.cloudfoundry.org/cli/v8/command/v7/shared"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc"
@@ -58,17 +55,6 @@ func NewPluginRunner(config *configv3.Config, commandUI *ui.UI, plugin configv3.
 // Run executes the plugin with the given arguments
 // Based on the plugin execution logic from cf/cmd/cmd.go (lines 140-163)
 func (r *pluginRunner) Run(args []string) error {
-	// Setup writer and trace logger (mimicking cf/cmd/cmd.go setup)
-	var writer io.Writer = os.Stdout
-
-	// Get verbose settings from config
-	verbose, tracePaths := r.config.Verbose()
-	traceLogger := trace.NewLogger(writer, verbose, tracePaths...)
-
-	// Create dependencies needed for RPC service
-	deps := commandregistry.NewDependency(writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
-	defer deps.Config.Close()
-
 	// Without a target the plugin still runs. RPC calls that need Cloud
 	// Controller return rpc.ErrNoAPISet.
 	var actor *v7action.Actor
