@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/ui"
 	"code.cloudfoundry.org/cli/v8/version"
@@ -42,14 +42,18 @@ type CliRpcCmd struct {
 	MetadataMutex  *sync.RWMutex
 	outputDisabled bool
 	cliConfig      *configv3.Config
-	outputBucket   *bytes.Buffer
+	outputBucket   *util.SynchronizedBuffer
 	actor          *v7action.Actor
 	commandParser  CommandParser
 	commandUI      *ui.UI
+
+	// coreCommandMutex serializes core command runs and guards outputDisabled and
+	// outputBucket: net/rpc serves each plugin connection on its own goroutine.
+	coreCommandMutex sync.Mutex
 }
 
 type OutputInterceptor struct {
-	capturedOutput *bytes.Buffer
+	capturedOutput io.Writer
 	stdout         io.Writer
 }
 
@@ -73,6 +77,7 @@ func NewRpcService(
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata: &plugin.PluginMetadata{},
 			MetadataMutex:  &sync.RWMutex{},
+			outputBucket:   &util.SynchronizedBuffer{},
 			cliConfig:      cliConfig,
 			actor:          actor,
 			commandParser:  commandParser,
@@ -157,6 +162,9 @@ func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, re
 }
 
 func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	cmd.outputDisabled = disable
 	*retVal = true
 	return nil
@@ -168,7 +176,10 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		return ErrCommandParserUnavailable
 	}
 
-	cmd.outputBucket = &bytes.Buffer{}
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
+	cmd.outputBucket.Reset()
 	stdout := &OutputInterceptor{
 		capturedOutput: cmd.outputBucket,
 	}
@@ -204,7 +215,13 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	return nil
 }
 
+// GetOutputAndReset returns the output of the latest core command. The name is a
+// misnomer kept for wire compatibility: like upstream, it does not reset the
+// output, which is only cleared when the next core command starts.
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	v := strings.TrimSuffix(cmd.outputBucket.String(), "\n")
 	*retVal = strings.Split(v, "\n")
 	return nil

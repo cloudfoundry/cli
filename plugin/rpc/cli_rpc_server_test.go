@@ -2,10 +2,13 @@ package rpc_test
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"net"
 	"net/rpc"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -24,6 +27,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/types"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -888,6 +892,85 @@ var _ = Describe("Server", func() {
 				Expect(commandParser.ParseCommandFromArgsCallCount()).To(Equal(1))
 				Expect(success).To(BeTrue())
 
+			})
+
+			It("captures concurrent stdout and stderr writes without racing", func() {
+				commandParser.ParseCommandFromArgsStub = func(u *ui.UI, _ []string) (int, error) {
+					var wg sync.WaitGroup
+					for _, w := range []io.Writer{u.GetOut(), u.GetErr()} {
+						wg.Add(1)
+						go func(w io.Writer) {
+							defer wg.Done()
+							for i := 0; i < 500; i++ {
+								fmt.Fprintln(w, "line")
+							}
+						}(w)
+					}
+					wg.Wait()
+					return 0, nil
+				}
+
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+
+				var ok bool
+				Expect(client.Call("CliRpcCmd.DisableTerminalOutput", true, &ok)).To(Succeed())
+				Expect(client.Call("CliRpcCmd.CallCoreCommand", []string{"fake"}, &ok)).To(Succeed())
+
+				var output []string
+				Expect(client.Call("CliRpcCmd.GetOutputAndReset", false, &output)).To(Succeed())
+				Expect(output).To(HaveLen(1000))
+				Expect(output).To(HaveEach("line"))
+			})
+
+			It("returns empty output when no core command has run yet", func() {
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+
+				var output []string
+				Expect(client.Call("CliRpcCmd.GetOutputAndReset", false, &output)).To(Succeed())
+				Expect(output).To(Equal([]string{""}))
+			})
+
+			It("only returns the output of the latest core command", func() {
+				runs := 0
+				commandParser.ParseCommandFromArgsStub = func(u *ui.UI, _ []string) (int, error) {
+					runs++
+					fmt.Fprintf(u.GetOut(), "output of run %d\n", runs)
+					return 0, nil
+				}
+
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+
+				var ok bool
+				Expect(client.Call("CliRpcCmd.DisableTerminalOutput", true, &ok)).To(Succeed())
+				Expect(client.Call("CliRpcCmd.CallCoreCommand", []string{"first"}, &ok)).To(Succeed())
+				Expect(client.Call("CliRpcCmd.CallCoreCommand", []string{"second"}, &ok)).To(Succeed())
+
+				var output []string
+				Expect(client.Call("CliRpcCmd.GetOutputAndReset", false, &output)).To(Succeed())
+				Expect(output).To(Equal([]string{"output of run 2"}))
+			})
+
+			It("keeps the output readable until the next core command, like upstream", func() {
+				commandParser.ParseCommandFromArgsStub = func(u *ui.UI, _ []string) (int, error) {
+					fmt.Fprintln(u.GetOut(), "some output")
+					return 0, nil
+				}
+
+				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+				Expect(err).ToNot(HaveOccurred())
+
+				var ok bool
+				Expect(client.Call("CliRpcCmd.DisableTerminalOutput", true, &ok)).To(Succeed())
+				Expect(client.Call("CliRpcCmd.CallCoreCommand", []string{"cmd"}, &ok)).To(Succeed())
+
+				var first, second []string
+				Expect(client.Call("CliRpcCmd.GetOutputAndReset", false, &first)).To(Succeed())
+				Expect(client.Call("CliRpcCmd.GetOutputAndReset", false, &second)).To(Succeed())
+				Expect(first).To(Equal([]string{"some output"}))
+				Expect(second).To(Equal(first))
 			})
 		})
 
