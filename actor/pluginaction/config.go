@@ -14,5 +14,6 @@ type Config interface {
 	PluginRepositories() []configv3.PluginRepository
 	Plugins() []configv3.Plugin
 	RemovePlugin(string)
+	RemovePluginRepository(string)
 	WritePluginConfig() error
 }
