@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"strings"
 
-	"code.cloudfoundry.org/cli/v8/cf/cmd"
 	"code.cloudfoundry.org/cli/v8/command"
 	"code.cloudfoundry.org/cli/v8/command/common"
 	"code.cloudfoundry.org/cli/v8/command/flag"
@@ -31,11 +30,6 @@ type UI interface {
 
 type DisplayUsage interface {
 	DisplayUsage()
-}
-
-type TriggerLegacyMain interface {
-	LegacyMain()
-	error
 }
 
 type CommandParser struct {
@@ -103,12 +97,6 @@ func (p *CommandParser) handleError(passedErr error) error {
 	case translatableerror.V3V2SwitchError:
 		log.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
 		return passedErr
-	case TriggerLegacyMain:
-		if typedErr.Error() != "" {
-			p.UI.DisplayWarning("")
-			p.UI.DisplayWarning(typedErr.Error())
-		}
-		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()
 		if sig := typedErr.Signal(); sig != "" {

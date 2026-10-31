@@ -121,7 +121,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("StagingTimeoutError", StagingTimeoutError{}),
 		Entry("StartupTimeoutError", StartupTimeoutError{}),
 		Entry("ThreeRequiredArgumentsError", ThreeRequiredArgumentsError{}),
-		Entry("TriggerLegacyPushError", TriggerLegacyPushError{}),
 		Entry("UnsupportedURLSchemeError", UnsupportedURLSchemeError{}),
 		Entry("UploadFailedError", UploadFailedError{Err: JobFailedError{}}),
 		Entry("V3APIDoesNotExistError", V3APIDoesNotExistError{}),

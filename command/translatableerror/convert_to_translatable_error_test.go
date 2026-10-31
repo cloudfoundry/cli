@@ -283,10 +283,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.TCPRouteOptionsNotProvidedError{},
 			TCPRouteOptionsNotProvidedError{}),
 
-		Entry("actionerror.TriggerLegacyPushError -> TriggerLegacyPushError",
-			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"domain", "host"}},
-			TriggerLegacyPushError{DomainHostRelated: []string{"domain", "host"}}),
-
 		Entry("actionerror.UploadFailedError -> UploadFailedError",
 			actionerror.UploadFailedError{Err: actionerror.NoDomainsFoundError{}},
 			UploadFailedError{Err: NoDomainsFoundError{}}),
@@ -389,14 +385,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("manifest.ManifestCreationError -> ManifestCreationError",
 			manifest.ManifestCreationError{Err: errors.New("some-error")},
 			FileCreationError{Err: errors.New("some-error")}),
-
-		Entry("manifest.InheritanceFieldError -> TriggerLegacyPushError",
-			manifest.InheritanceFieldError{},
-			TriggerLegacyPushError{InheritanceRelated: true}),
-
-		Entry("manifest.GlobalFieldError -> TriggerLegacyPushError",
-			manifest.GlobalFieldsError{Fields: []string{"some-field"}},
-			TriggerLegacyPushError{GlobalRelated: []string{"some-field"}}),
 
 		Entry("manifest.InterpolationError -> InterpolationError",
 			manifest.InterpolationError{Err: errors.New("an-error")},
