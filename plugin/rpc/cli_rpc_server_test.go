@@ -454,7 +454,7 @@ var _ = Describe("Server", func() {
 						Host:       "fake-app",
 						Path:       "/path",
 						DomainGUID: "fake-domain-guid",
-						URL:        "fake-app.example.com",
+						URL:        "fake-app.example.com/path",
 					},
 				},
 				ccv3.Warnings{},
@@ -527,6 +527,8 @@ var _ = Describe("Server", func() {
 			Expect(result.Stack.Name).To(Equal("cflinuxfs3"))
 			Expect(len(result.Routes)).To(Equal(1))
 			Expect(result.Routes[0].Host).To(Equal("fake-app"))
+			Expect(result.Routes[0].Path).To(Equal("/path"))
+			Expect(result.Routes[0].Domain.Name).To(Equal("example.com"))
 			Expect(len(result.Services)).To(Equal(1))
 			Expect(result.Services[0].Name).To(Equal("fake-binding"))
 		})
@@ -814,6 +816,7 @@ var _ = Describe("Server", func() {
 			Expect(result[0].DiskQuota).To(Equal(int64(2048)))
 			Expect(len(result[0].Routes)).To(Equal(1))
 			Expect(result[0].Routes[0].Host).To(Equal("app-1"))
+			Expect(result[0].Routes[0].Domain.Name).To(Equal("example.com"))
 			Expect(result[1].Name).To(Equal("app-2"))
 			Expect(result[1].Guid).To(Equal("app-2-guid"))
 			Expect(result[1].State).To(Equal("stopped"))

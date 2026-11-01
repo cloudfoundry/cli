@@ -1915,4 +1915,14 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 	})
+
+	DescribeTable("DomainNameFromRouteURL",
+		func(fullURL, host, path string, port int, expected string) {
+			Expect(DomainNameFromRouteURL(fullURL, host, path, port)).To(Equal(expected))
+		},
+		Entry("HTTP route with a host", "myapp.apps.example.com", "myapp", "", 0, "apps.example.com"),
+		Entry("HTTP route with a host and a path", "myapp.apps.example.com/api", "myapp", "/api", 0, "apps.example.com"),
+		Entry("TCP route with a port", "tcp.example.com:1024", "", "", 1024, "tcp.example.com"),
+		Entry("route without a host", "apps.example.com", "", "", 0, "apps.example.com"),
+	)
 })

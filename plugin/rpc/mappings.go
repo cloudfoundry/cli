@@ -449,7 +449,7 @@ func populateAppModel(
 			Port: route.Port,
 			Domain: plugin_models.GetApp_DomainFields{
 				Guid: route.DomainGUID,
-				Name: route.URL, // URL contains the full domain
+				Name: v7action.DomainNameFromRouteURL(route.URL, route.Host, route.Path, route.Port),
 			},
 		}
 	}
@@ -505,7 +505,7 @@ func populateAppsModel(summaries []v7action.ApplicationSummary) []plugin_models.
 				Host: route.Host,
 				Domain: plugin_models.GetAppsDomainFields{
 					Guid: route.DomainGUID,
-					Name: route.URL,
+					Name: v7action.DomainNameFromRouteURL(route.URL, route.Host, route.Path, route.Port),
 				},
 			}
 		}
