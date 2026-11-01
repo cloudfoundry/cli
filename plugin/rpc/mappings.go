@@ -378,7 +378,7 @@ func primaryProcess(processes v7action.ProcessSummaries) *v7action.ProcessSummar
 // populateAppModel maps v3 DetailedApplicationSummary to plugin model
 func populateAppModel(
 	summary v7action.DetailedApplicationSummary,
-	serviceBindings []resources.ServiceCredentialBinding,
+	serviceInstances []resources.ServiceInstance,
 	stack resources.Stack,
 	envVars map[string]interface{},
 ) plugin_models.GetAppModel {
@@ -463,12 +463,12 @@ func populateAppModel(
 		}
 	}
 
-	// Populate bound services
-	model.Services = make([]plugin_models.GetApp_ServiceSummary, len(serviceBindings))
-	for i, binding := range serviceBindings {
+	// Populate bound service instances
+	model.Services = make([]plugin_models.GetApp_ServiceSummary, len(serviceInstances))
+	for i, instance := range serviceInstances {
 		model.Services[i] = plugin_models.GetApp_ServiceSummary{
-			Guid: binding.ServiceInstanceGUID,
-			Name: binding.Name,
+			Guid: instance.GUID,
+			Name: instance.Name,
 		}
 	}
 

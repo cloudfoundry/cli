@@ -403,6 +403,38 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 		return err
 	}
 
+	// Resolve the bound service instances (legacy reported instance names, one
+	// entry per instance, while v3 can have several bindings per instance)
+	var serviceInstanceGUIDs []string
+	seenInstances := make(map[string]bool)
+	for _, binding := range serviceBindings {
+		if !seenInstances[binding.ServiceInstanceGUID] {
+			seenInstances[binding.ServiceInstanceGUID] = true
+			serviceInstanceGUIDs = append(serviceInstanceGUIDs, binding.ServiceInstanceGUID)
+		}
+	}
+
+	var serviceInstances []resources.ServiceInstance
+	if len(serviceInstanceGUIDs) > 0 {
+		instances, _, ccWarnings, err := actor.CloudControllerClient.GetServiceInstances(
+			ccv3.Query{Key: ccv3.GUIDFilter, Values: serviceInstanceGUIDs},
+		)
+		cmd.displayWarnings(ccWarnings)
+		if err != nil {
+			return err
+		}
+
+		instancesByGUID := make(map[string]resources.ServiceInstance, len(instances))
+		for _, instance := range instances {
+			instancesByGUID[instance.GUID] = instance
+		}
+		for _, guid := range serviceInstanceGUIDs {
+			if instance, found := instancesByGUID[guid]; found {
+				serviceInstances = append(serviceInstances, instance)
+			}
+		}
+	}
+
 	// Get stack information
 	var stack resources.Stack
 	if summary.CurrentDroplet.Stack != "" {
@@ -429,7 +461,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	}
 
 	// Populate the plugin model
-	*retVal = populateAppModel(summary, serviceBindings, stack, environment.EnvironmentVariables)
+	*retVal = populateAppModel(summary, serviceInstances, stack, environment.EnvironmentVariables)
 	return nil
 }
 

@@ -486,6 +486,12 @@ var _ = Describe("Server", func() {
 				ccv3.Warnings{},
 				nil,
 			)
+			fakeCloudControllerClient.GetServiceInstancesReturns(
+				[]resources.ServiceInstance{{GUID: "fake-service-guid", Name: "fake-service"}},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
 
 			fakeCloudControllerClient.GetStacksReturns(
 				[]resources.Stack{
@@ -526,8 +532,7 @@ var _ = Describe("Server", func() {
 			Expect(result.Routes[0].Host).To(Equal("fake-app"))
 			Expect(result.Routes[0].Path).To(Equal("/path"))
 			Expect(result.Routes[0].Domain.Name).To(Equal("example.com"))
-			Expect(len(result.Services)).To(Equal(1))
-			Expect(result.Services[0].Name).To(Equal("fake-binding"))
+			Expect(result.Services).To(Equal([]plugin_models.GetApp_ServiceSummary{{Guid: "fake-service-guid", Name: "fake-service"}}))
 		})
 
 		It("calls GetOrg() with 'my-org' as argument", func() {
@@ -877,6 +882,54 @@ var _ = Describe("Server", func() {
 				result := plugin_models.GetAppModel{}
 				err := client.Call("CliRpcCmd.GetApp", "fake-app", &result)
 				Expect(err).To(MatchError(ContainSubstring("boom")))
+			})
+		})
+
+		Describe("GetApp bound services", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{{GUID: "fake-app-guid", Name: "fake-app", State: constant.ApplicationStarted, SpaceGUID: "test-space-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("reports service instance names, once per instance, in binding order", func() {
+				fakeCloudControllerClient.GetServiceCredentialBindingsReturns(
+					[]resources.ServiceCredentialBinding{
+						{GUID: "b1", Name: "db-reader", ServiceInstanceGUID: "si-1"},
+						{GUID: "b2", Name: "", ServiceInstanceGUID: "si-1"},
+						{GUID: "b3", Name: "", ServiceInstanceGUID: "si-2"},
+					},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetServiceInstancesReturns(
+					[]resources.ServiceInstance{{GUID: "si-2", Name: "cache"}, {GUID: "si-1", Name: "my-db"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "fake-app", &result)).To(Succeed())
+
+				Expect(result.Services).To(Equal([]plugin_models.GetApp_ServiceSummary{
+					{Guid: "si-1", Name: "my-db"},
+					{Guid: "si-2", Name: "cache"},
+				}))
+				Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ContainElement(
+					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"si-1", "si-2"}},
+				))
+			})
+
+			It("does not query service instances when there are no bindings", func() {
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "fake-app", &result)).To(Succeed())
+
+				Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(0))
+				Expect(result.Services).To(BeEmpty())
 			})
 		})
 
