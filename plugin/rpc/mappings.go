@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
 	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/types"
 )
 
 // populateServiceModel maps v3 API resources to the plugin model
@@ -172,6 +173,15 @@ func populateSpaceUsersModel(usersByRole map[constant.RoleType][]resources.User)
 	return result
 }
 
+// quotaLimit maps a v3 quota limit to the legacy plugin value: CAPI v3 reports an
+// unlimited quota as null (unset), which legacy (v2) plugins received as -1.
+func quotaLimit(limit *types.NullInt) int64 {
+	if limit == nil || !limit.IsSet {
+		return -1
+	}
+	return int64(limit.Value)
+}
+
 // populateOrgModel maps v3 Organization and related resources to plugin model
 func populateOrgModel(
 	org resources.Organization,
@@ -191,23 +201,10 @@ func populateOrgModel(
 		Name: quota.Name,
 	}
 
-	// Map memory limits (convert from NullInt)
-	if quota.Apps.TotalMemory != nil {
-		model.QuotaDefinition.MemoryLimit = int64(quota.Apps.TotalMemory.Value)
-	}
-	if quota.Apps.InstanceMemory != nil {
-		model.QuotaDefinition.InstanceMemoryLimit = int64(quota.Apps.InstanceMemory.Value)
-	}
-
-	// Map route limit
-	if quota.Routes.TotalRoutes != nil {
-		model.QuotaDefinition.RoutesLimit = quota.Routes.TotalRoutes.Value
-	}
-
-	// Map service limit
-	if quota.Services.TotalServiceInstances != nil {
-		model.QuotaDefinition.ServicesLimit = quota.Services.TotalServiceInstances.Value
-	}
+	model.QuotaDefinition.MemoryLimit = quotaLimit(quota.Apps.TotalMemory)
+	model.QuotaDefinition.InstanceMemoryLimit = quotaLimit(quota.Apps.InstanceMemory)
+	model.QuotaDefinition.RoutesLimit = int(quotaLimit(quota.Routes.TotalRoutes))
+	model.QuotaDefinition.ServicesLimit = int(quotaLimit(quota.Services.TotalServiceInstances))
 
 	// Map paid services allowed
 	if quota.Services.PaidServicePlans != nil {
@@ -242,19 +239,10 @@ func populateOrgModel(
 			Name: sq.Name,
 		}
 
-		// Map space quota limits
-		if sq.Apps.TotalMemory != nil {
-			spaceQuota.MemoryLimit = int64(sq.Apps.TotalMemory.Value)
-		}
-		if sq.Apps.InstanceMemory != nil {
-			spaceQuota.InstanceMemoryLimit = int64(sq.Apps.InstanceMemory.Value)
-		}
-		if sq.Routes.TotalRoutes != nil {
-			spaceQuota.RoutesLimit = sq.Routes.TotalRoutes.Value
-		}
-		if sq.Services.TotalServiceInstances != nil {
-			spaceQuota.ServicesLimit = sq.Services.TotalServiceInstances.Value
-		}
+		spaceQuota.MemoryLimit = quotaLimit(sq.Apps.TotalMemory)
+		spaceQuota.InstanceMemoryLimit = quotaLimit(sq.Apps.InstanceMemory)
+		spaceQuota.RoutesLimit = int(quotaLimit(sq.Routes.TotalRoutes))
+		spaceQuota.ServicesLimit = int(quotaLimit(sq.Services.TotalServiceInstances))
 		if sq.Services.PaidServicePlans != nil {
 			spaceQuota.NonBasicServicesAllowed = *sq.Services.PaidServicePlans
 		}
@@ -358,19 +346,10 @@ func populateSpaceModel(
 			Name: spaceQuota.Name,
 		}
 
-		// Map space quota limits
-		if spaceQuota.Apps.TotalMemory != nil {
-			model.SpaceQuota.MemoryLimit = int64(spaceQuota.Apps.TotalMemory.Value)
-		}
-		if spaceQuota.Apps.InstanceMemory != nil {
-			model.SpaceQuota.InstanceMemoryLimit = int64(spaceQuota.Apps.InstanceMemory.Value)
-		}
-		if spaceQuota.Routes.TotalRoutes != nil {
-			model.SpaceQuota.RoutesLimit = spaceQuota.Routes.TotalRoutes.Value
-		}
-		if spaceQuota.Services.TotalServiceInstances != nil {
-			model.SpaceQuota.ServicesLimit = spaceQuota.Services.TotalServiceInstances.Value
-		}
+		model.SpaceQuota.MemoryLimit = quotaLimit(spaceQuota.Apps.TotalMemory)
+		model.SpaceQuota.InstanceMemoryLimit = quotaLimit(spaceQuota.Apps.InstanceMemory)
+		model.SpaceQuota.RoutesLimit = int(quotaLimit(spaceQuota.Routes.TotalRoutes))
+		model.SpaceQuota.ServicesLimit = int(quotaLimit(spaceQuota.Services.TotalServiceInstances))
 		if spaceQuota.Services.PaidServicePlans != nil {
 			model.SpaceQuota.NonBasicServicesAllowed = *spaceQuota.Services.PaidServicePlans
 		}

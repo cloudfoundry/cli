@@ -624,6 +624,103 @@ var _ = Describe("Server", func() {
 			Expect(result.Name).To(Equal("my-space"))
 		})
 
+		Describe("quota limits", func() {
+			unset := func() *types.NullInt { return &types.NullInt{IsSet: false} }
+			set := func(v int) *types.NullInt { return &types.NullInt{IsSet: true, Value: v} }
+
+			quotaWith := func(guid string, totalMemory, instanceMemory, routes, services *types.NullInt) resources.Quota {
+				return resources.Quota{
+					GUID:     guid,
+					Name:     guid + "-name",
+					Apps:     resources.AppLimit{TotalMemory: totalMemory, InstanceMemory: instanceMemory},
+					Routes:   resources.RouteLimit{TotalRoutes: routes},
+					Services: resources.ServiceLimit{TotalServiceInstances: services},
+				}
+			}
+
+			Describe("GetOrg", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns(
+						[]resources.Organization{{GUID: "my-org-guid", Name: "my-org", QuotaGUID: "org-quota"}},
+						ccv3.Warnings{},
+						nil,
+					)
+				})
+
+				It("maps unset quota limits to -1", func() {
+					fakeCloudControllerClient.GetOrganizationQuotaReturns(
+						resources.OrganizationQuota{Quota: quotaWith("org-quota", unset(), unset(), unset(), unset())},
+						ccv3.Warnings{},
+						nil,
+					)
+					fakeCloudControllerClient.GetSpaceQuotasReturns(
+						[]resources.SpaceQuota{{Quota: quotaWith("space-quota", unset(), unset(), unset(), unset())}},
+						ccv3.Warnings{},
+						nil,
+					)
+
+					result := plugin_models.GetOrg_Model{}
+					Expect(client.Call("CliRpcCmd.GetOrg", "my-org", &result)).To(Succeed())
+
+					Expect(result.QuotaDefinition.MemoryLimit).To(Equal(int64(-1)))
+					Expect(result.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(-1)))
+					Expect(result.QuotaDefinition.RoutesLimit).To(Equal(-1))
+					Expect(result.QuotaDefinition.ServicesLimit).To(Equal(-1))
+
+					Expect(result.SpaceQuotas).To(HaveLen(1))
+					Expect(result.SpaceQuotas[0].MemoryLimit).To(Equal(int64(-1)))
+					Expect(result.SpaceQuotas[0].InstanceMemoryLimit).To(Equal(int64(-1)))
+					Expect(result.SpaceQuotas[0].RoutesLimit).To(Equal(-1))
+					Expect(result.SpaceQuotas[0].ServicesLimit).To(Equal(-1))
+				})
+
+				It("keeps set limits, including an explicit 0", func() {
+					fakeCloudControllerClient.GetOrganizationQuotaReturns(
+						resources.OrganizationQuota{Quota: quotaWith("org-quota", set(10240), set(1024), set(0), set(5))},
+						ccv3.Warnings{},
+						nil,
+					)
+
+					result := plugin_models.GetOrg_Model{}
+					Expect(client.Call("CliRpcCmd.GetOrg", "my-org", &result)).To(Succeed())
+
+					Expect(result.QuotaDefinition.MemoryLimit).To(Equal(int64(10240)))
+					Expect(result.QuotaDefinition.InstanceMemoryLimit).To(Equal(int64(1024)))
+					Expect(result.QuotaDefinition.RoutesLimit).To(Equal(0))
+					Expect(result.QuotaDefinition.ServicesLimit).To(Equal(5))
+				})
+			})
+
+			Describe("GetSpace", func() {
+				It("maps unset space quota limits to -1", func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]resources.Space{{
+							GUID:          "my-space-guid",
+							Name:          "my-space",
+							Relationships: resources.Relationships{constant.RelationshipTypeQuota: {GUID: "space-quota"}},
+						}},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{},
+						nil,
+					)
+					fakeCloudControllerClient.GetSpaceQuotaReturns(
+						resources.SpaceQuota{Quota: quotaWith("space-quota", unset(), unset(), unset(), unset())},
+						ccv3.Warnings{},
+						nil,
+					)
+
+					result := plugin_models.GetSpace_Model{}
+					Expect(client.Call("CliRpcCmd.GetSpace", "my-space", &result)).To(Succeed())
+
+					Expect(result.SpaceQuota.Guid).To(Equal("space-quota"))
+					Expect(result.SpaceQuota.MemoryLimit).To(Equal(int64(-1)))
+					Expect(result.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
+					Expect(result.SpaceQuota.RoutesLimit).To(Equal(-1))
+					Expect(result.SpaceQuota.ServicesLimit).To(Equal(-1))
+				})
+			})
+		})
+
 		It("calls GetApps() ", func() {
 			// Setup fake actor to return applications
 			fakeCloudControllerClient.GetApplicationsReturns(
