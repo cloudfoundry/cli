@@ -46,8 +46,7 @@ func NewRepositoryWithDefaults() coreconfig.Repository {
 // default values as NewRepositoryWithDefaults for testing purposes.
 func NewConfigWithDefaults() *configv3.Config {
 	// Create a proper JWT token with user info for configv3
-	// For UAA users, the user_name field contains the email
-	accessToken := BuildTokenStringWithUserInfo("my-user-guid", "my-user-email", "my-user-email", "uaa")
+	accessToken := BuildTokenStringWithUserInfo("my-user-guid", "my-user-name", "my-user-email", "uaa")
 
 	jsonConfig := configv3.JSONConfig{
 		AccessToken: accessToken,

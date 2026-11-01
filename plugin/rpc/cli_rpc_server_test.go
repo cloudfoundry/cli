@@ -1079,8 +1079,7 @@ var _ = Describe("Server", func() {
 					var result string
 					err = client.Call("CliRpcCmd.Username", "", &result)
 					Expect(err).ToNot(HaveOccurred())
-					// For UAA users, username is the email from the JWT's user_name claim
-					Expect(result).To(Equal("my-user-email"))
+					Expect(result).To(Equal("my-user-name"))
 
 					err = client.Call("CliRpcCmd.UserGuid", "", &result)
 					Expect(err).ToNot(HaveOccurred())

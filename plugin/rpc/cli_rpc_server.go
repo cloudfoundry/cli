@@ -287,7 +287,7 @@ func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
 		*retVal = ""
 		return nil
 	}
-	*retVal = user.Name // For UAA users, Name contains the email
+	*retVal = user.Email
 
 	return nil
 }

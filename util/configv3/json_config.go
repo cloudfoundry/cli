@@ -52,6 +52,7 @@ type User struct {
 	Name     string
 	GUID     string
 	Origin   string
+	Email    string
 	IsClient bool
 }
 

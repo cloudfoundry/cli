@@ -41,6 +41,7 @@ var _ = Describe("DefaultUserConfig", func() {
 					Name:     "admin",
 					GUID:     "9519be3e-44d9-40d0-ab9a-f4ace11df159",
 					Origin:   "uaa",
+					Email:    "admin",
 					IsClient: false,
 				}))
 			})
