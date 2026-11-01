@@ -360,6 +360,21 @@ func populateSpaceModel(
 	return model
 }
 
+// primaryProcess returns the process that represents the app in the legacy
+// plugin models: the web process, or the first process when there is no web
+// process, or nil when the app has no processes.
+func primaryProcess(processes v7action.ProcessSummaries) *v7action.ProcessSummary {
+	for i := range processes {
+		if processes[i].Type == constant.ProcessTypeWeb {
+			return &processes[i]
+		}
+	}
+	if len(processes) > 0 {
+		return &processes[0]
+	}
+	return nil
+}
+
 // populateAppModel maps v3 DetailedApplicationSummary to plugin model
 func populateAppModel(
 	summary v7action.DetailedApplicationSummary,
@@ -373,37 +388,29 @@ func populateAppModel(
 		SpaceGuid: summary.SpaceGUID,
 	}
 
-	// Find the web process for main app details
-	var webProcess *v7action.ProcessSummary
-	for i := range summary.ProcessSummaries {
-		if summary.ProcessSummaries[i].Type == constant.ProcessTypeWeb {
-			webProcess = &summary.ProcessSummaries[i]
-			break
-		}
-	}
-
-	if webProcess != nil {
+	process := primaryProcess(summary.ProcessSummaries)
+	if process != nil {
 		// Memory in MB
-		model.Memory = int64(webProcess.MemoryInMB.Value)
+		model.Memory = int64(process.MemoryInMB.Value)
 
 		// Disk quota in MB
-		model.DiskQuota = int64(webProcess.DiskInMB.Value)
+		model.DiskQuota = int64(process.DiskInMB.Value)
 
 		// Instance count
-		model.InstanceCount = webProcess.Instances.Value
+		model.InstanceCount = process.Instances.Value
 
 		// Running instances
-		model.RunningInstances = webProcess.HealthyInstanceCount()
+		model.RunningInstances = process.HealthyInstanceCount()
 
 		// Health check timeout
-		model.HealthCheckTimeout = int(webProcess.HealthCheckTimeout)
+		model.HealthCheckTimeout = int(process.HealthCheckTimeout)
 
 		// Command
-		model.Command = webProcess.Command.Value
+		model.Command = process.Command.Value
 
 		// Map instances
-		model.Instances = make([]plugin_models.GetApp_AppInstanceFields, len(webProcess.InstanceDetails))
-		for i, inst := range webProcess.InstanceDetails {
+		model.Instances = make([]plugin_models.GetApp_AppInstanceFields, len(process.InstanceDetails))
+		for i, inst := range process.InstanceDetails {
 			// Calculate actual time from uptime duration
 			since := time.Now().Add(-inst.Uptime)
 			model.Instances[i] = plugin_models.GetApp_AppInstanceFields{
@@ -480,21 +487,12 @@ func populateAppsModel(summaries []v7action.ApplicationSummary) []plugin_models.
 			State: strings.ToLower(string(summary.State)),
 		}
 
-		// Get web process if it exists
-		var webProcess *v7action.ProcessSummary
-		for j := range summary.ProcessSummaries {
-			if summary.ProcessSummaries[j].Type == constant.ProcessTypeWeb {
-				webProcess = &summary.ProcessSummaries[j]
-				break
-			}
-		}
-
-		// Populate instance and resource info from web process
-		if webProcess != nil {
-			model.TotalInstances = webProcess.TotalInstanceCount()
-			model.RunningInstances = webProcess.HealthyInstanceCount()
-			model.Memory = int64(webProcess.MemoryInMB.Value)
-			model.DiskQuota = int64(webProcess.DiskInMB.Value)
+		process := primaryProcess(summary.ProcessSummaries)
+		if process != nil {
+			model.TotalInstances = process.Instances.Value // desired scale, as legacy reported
+			model.RunningInstances = process.HealthyInstanceCount()
+			model.Memory = int64(process.MemoryInMB.Value)
+			model.DiskQuota = int64(process.DiskInMB.Value)
 		}
 
 		// Populate routes

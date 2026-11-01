@@ -767,8 +767,8 @@ var _ = Describe("Server", func() {
 			// Setup processes for apps
 			fakeCloudControllerClient.GetProcessesReturns(
 				[]resources.Process{
-					{GUID: "process-1-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-1-guid", MemoryInMB: types.NullUint64{Value: 1024, IsSet: true}, DiskInMB: types.NullUint64{Value: 2048, IsSet: true}},
-					{GUID: "process-2-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-2-guid", MemoryInMB: types.NullUint64{Value: 512, IsSet: true}, DiskInMB: types.NullUint64{Value: 1024, IsSet: true}},
+					{GUID: "process-1-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-1-guid", Instances: types.NullInt{Value: 4, IsSet: true}, MemoryInMB: types.NullUint64{Value: 1024, IsSet: true}, DiskInMB: types.NullUint64{Value: 2048, IsSet: true}},
+					{GUID: "process-2-guid", Type: constant.ProcessTypeWeb, AppGUID: "app-2-guid", Instances: types.NullInt{Value: 3, IsSet: true}, MemoryInMB: types.NullUint64{Value: 512, IsSet: true}, DiskInMB: types.NullUint64{Value: 1024, IsSet: true}},
 				},
 				ccv3.Warnings{},
 				nil,
@@ -784,9 +784,7 @@ var _ = Describe("Server", func() {
 				nil,
 			)
 			fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
-				[]ccv3.ProcessInstance{
-					{State: constant.ProcessInstanceDown, Index: 0},
-				},
+				[]ccv3.ProcessInstance{},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -810,7 +808,7 @@ var _ = Describe("Server", func() {
 			Expect(result[0].Name).To(Equal("app-1"))
 			Expect(result[0].Guid).To(Equal("app-1-guid"))
 			Expect(result[0].State).To(Equal("started"))
-			Expect(result[0].TotalInstances).To(Equal(2))
+			Expect(result[0].TotalInstances).To(Equal(4))
 			Expect(result[0].RunningInstances).To(Equal(2))
 			Expect(result[0].Memory).To(Equal(int64(1024)))
 			Expect(result[0].DiskQuota).To(Equal(int64(2048)))
@@ -820,6 +818,58 @@ var _ = Describe("Server", func() {
 			Expect(result[1].Name).To(Equal("app-2"))
 			Expect(result[1].Guid).To(Equal("app-2-guid"))
 			Expect(result[1].State).To(Equal("stopped"))
+			Expect(result[1].TotalInstances).To(Equal(3))
+			Expect(result[1].RunningInstances).To(Equal(0))
+		})
+
+		Describe("when an app has no web process", func() {
+			workerProcess := resources.Process{
+				GUID:       "worker-process-guid",
+				Type:       "worker",
+				AppGUID:    "worker-app-guid",
+				Instances:  types.NullInt{Value: 3, IsSet: true},
+				MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
+				DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+			}
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{{GUID: "worker-app-guid", Name: "worker-app", State: constant.ApplicationStarted, SpaceGUID: "test-space-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetProcessInstancesReturns(
+					[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning, Index: 0}},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("GetApp falls back to the first process", func() {
+				fakeCloudControllerClient.GetApplicationProcessesReturns([]resources.Process{workerProcess}, ccv3.Warnings{}, nil)
+
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "worker-app", &result)).To(Succeed())
+
+				Expect(result.InstanceCount).To(Equal(3))
+				Expect(result.RunningInstances).To(Equal(1))
+				Expect(result.Memory).To(Equal(int64(256)))
+				Expect(result.DiskQuota).To(Equal(int64(512)))
+				Expect(result.Instances).To(HaveLen(1))
+			})
+
+			It("GetApps falls back to the first process", func() {
+				fakeCloudControllerClient.GetProcessesReturns([]resources.Process{workerProcess}, ccv3.Warnings{}, nil)
+
+				result := []plugin_models.GetAppsModel{}
+				Expect(client.Call("CliRpcCmd.GetApps", "", &result)).To(Succeed())
+
+				Expect(result).To(HaveLen(1))
+				Expect(result[0].TotalInstances).To(Equal(3))
+				Expect(result[0].RunningInstances).To(Equal(1))
+				Expect(result[0].Memory).To(Equal(int64(256)))
+				Expect(result[0].DiskQuota).To(Equal(int64(512)))
+			})
 		})
 
 		It("calls GetOrgs() ", func() {
