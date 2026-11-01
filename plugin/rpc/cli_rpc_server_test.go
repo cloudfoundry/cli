@@ -515,7 +515,9 @@ var _ = Describe("Server", func() {
 			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 			Expect(result.Guid).To(Equal("fake-app-guid"))
 			Expect(result.Name).To(Equal("fake-app"))
-			Expect(result.State).To(Equal("STARTED"))
+			Expect(result.State).To(Equal("started"))
+			Expect(result.Instances).To(HaveLen(1))
+			Expect(result.Instances[0].State).To(Equal("running"))
 			Expect(result.Memory).To(Equal(int64(1024)))
 			Expect(result.DiskQuota).To(Equal(int64(512)))
 			Expect(result.InstanceCount).To(Equal(2))
@@ -805,7 +807,7 @@ var _ = Describe("Server", func() {
 			Expect(len(result)).To(Equal(2))
 			Expect(result[0].Name).To(Equal("app-1"))
 			Expect(result[0].Guid).To(Equal("app-1-guid"))
-			Expect(result[0].State).To(Equal(string(constant.ApplicationStarted)))
+			Expect(result[0].State).To(Equal("started"))
 			Expect(result[0].TotalInstances).To(Equal(2))
 			Expect(result[0].RunningInstances).To(Equal(2))
 			Expect(result[0].Memory).To(Equal(int64(1024)))
@@ -814,6 +816,7 @@ var _ = Describe("Server", func() {
 			Expect(result[0].Routes[0].Host).To(Equal("app-1"))
 			Expect(result[1].Name).To(Equal("app-2"))
 			Expect(result[1].Guid).To(Equal("app-2-guid"))
+			Expect(result[1].State).To(Equal("stopped"))
 		})
 
 		It("calls GetOrgs() ", func() {

@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -368,7 +369,7 @@ func populateAppModel(
 	model := plugin_models.GetAppModel{
 		Guid:      summary.GUID,
 		Name:      summary.Name,
-		State:     string(summary.State),
+		State:     strings.ToLower(string(summary.State)),
 		SpaceGuid: summary.SpaceGUID,
 	}
 
@@ -406,7 +407,7 @@ func populateAppModel(
 			// Calculate actual time from uptime duration
 			since := time.Now().Add(-inst.Uptime)
 			model.Instances[i] = plugin_models.GetApp_AppInstanceFields{
-				State:     string(inst.State),
+				State:     strings.ToLower(string(inst.State)),
 				Details:   inst.Details,
 				Since:     since,
 				CpuUsage:  inst.CPU,
@@ -476,7 +477,7 @@ func populateAppsModel(summaries []v7action.ApplicationSummary) []plugin_models.
 		model := plugin_models.GetAppsModel{
 			Name:  summary.Name,
 			Guid:  summary.GUID,
-			State: string(summary.State),
+			State: strings.ToLower(string(summary.State)),
 		}
 
 		// Get web process if it exists
