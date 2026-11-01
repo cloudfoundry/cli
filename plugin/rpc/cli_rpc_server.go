@@ -238,12 +238,11 @@ func (cmd *CliRpcCmd) getActor() (*v7action.Actor, error) {
 	return nil, ErrActorUnavailable
 }
 
-// displayWarnings displays warning messages using commandUI
+// displayWarnings writes Cloud Controller warnings to stderr, keeping the
+// plugin's stdout free of CLI output (legacy Get* calls printed nothing).
 func (cmd *CliRpcCmd) displayWarnings(warnings []string) {
 	if cmd.commandUI != nil {
-		for _, warning := range warnings {
-			cmd.commandUI.DisplayTextLiteral(fmt.Sprintf("Warning: %s", warning))
-		}
+		cmd.commandUI.DisplayWarnings(warnings)
 	}
 }
 

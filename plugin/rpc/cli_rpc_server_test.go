@@ -32,6 +32,7 @@ import (
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("Server", func() {
@@ -358,6 +359,7 @@ var _ = Describe("Server", func() {
 			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 			fakeSharedActor           *v7actionfakes.FakeSharedActor
 			fakeUAAClient             *v7actionfakes.FakeUAAClient
+			uiOut, uiErr              *Buffer
 		)
 
 		BeforeEach(func() {
@@ -378,7 +380,10 @@ var _ = Describe("Server", func() {
 			// Create actor with fakes (using v3config which implements v7action.Config interface)
 			actor := v7action.NewActor(fakeCloudControllerClient, v3config, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-			rpcService, err = NewRpcService(v3config, rpc.DefaultServer, actor, nil, nil)
+			uiOut, uiErr = NewBuffer(), NewBuffer()
+			testUI := ui.NewTestUI(nil, uiOut, uiErr)
+
+			rpcService, err = NewRpcService(v3config, rpc.DefaultServer, actor, nil, testUI)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -388,6 +393,20 @@ var _ = Describe("Server", func() {
 
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("writes Cloud Controller warnings to stderr, not stdout", func() {
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]resources.Organization{{GUID: "o", Name: "org"}},
+				ccv3.Warnings{"cc-warning"},
+				nil,
+			)
+
+			var result []plugin_models.GetOrgs_Model
+			Expect(client.Call("CliRpcCmd.GetOrgs", "", &result)).To(Succeed())
+
+			Expect(uiErr).To(Say("cc-warning"))
+			Expect(uiOut.Contents()).To(BeEmpty())
 		})
 
 		AfterEach(func() {
