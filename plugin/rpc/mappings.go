@@ -83,6 +83,7 @@ func populateServicesModel(services []v7action.ServiceInstance) []plugin_models.
 		// Populate service plan
 		models[i].ServicePlan = plugin_models.GetServices_ServicePlan{
 			Name: svc.ServicePlanName,
+			Guid: svc.ServicePlanGUID,
 		}
 
 		// Populate service fields

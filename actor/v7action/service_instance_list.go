@@ -17,6 +17,7 @@ type ServiceInstance struct {
 	Type                resources.ServiceInstanceType
 	Name                string
 	ServicePlanName     string
+	ServicePlanGUID     string
 	ServiceOfferingName string
 	ServiceBrokerName   string
 	BoundApps           []string
@@ -82,6 +83,7 @@ func (actor Actor) GetServiceInstancesForSpace(spaceGUID string, omitApps bool) 
 			Type:                instance.Type,
 			UpgradeAvailable:    instance.UpgradeAvailable,
 			ServicePlanName:     names.plan,
+			ServicePlanGUID:     instance.ServicePlanGUID,
 			ServiceOfferingName: names.offering,
 			ServiceBrokerName:   names.broker,
 			BoundApps:           boundAppsNamesFromInstanceGUIDLookup[instance.GUID],

@@ -841,10 +841,12 @@ var _ = Describe("Server", func() {
 			// Setup fake actor to return service instances
 			fakeCloudControllerClient.GetServiceInstancesReturns(
 				[]resources.ServiceInstance{
-					{GUID: "service-1-guid", Name: "service-1"},
-					{GUID: "service-2-guid", Name: "service-2"},
+					{GUID: "service-1-guid", Name: "service-1", Type: resources.ManagedServiceInstance, ServicePlanGUID: "plan-guid"},
+					{GUID: "service-2-guid", Name: "service-2", Type: resources.UserProvidedServiceInstance},
 				},
-				ccv3.IncludedResources{},
+				ccv3.IncludedResources{
+					ServicePlans: []resources.ServicePlan{{GUID: "plan-guid", Name: "plan-name"}},
+				},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -856,7 +858,9 @@ var _ = Describe("Server", func() {
 			Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(BeNumerically(">=", 1))
 			Expect(len(result)).To(Equal(2))
 			Expect(result[0].Name).To(Equal("service-1"))
+			Expect(result[0].ServicePlan).To(Equal(plugin_models.GetServices_ServicePlan{Guid: "plan-guid", Name: "plan-name"}))
 			Expect(result[1].Name).To(Equal("service-2"))
+			Expect(result[1].ServicePlan).To(Equal(plugin_models.GetServices_ServicePlan{}))
 		})
 
 		It("calls GetSpaces() ", func() {
