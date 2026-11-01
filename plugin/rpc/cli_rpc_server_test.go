@@ -624,6 +624,34 @@ var _ = Describe("Server", func() {
 			Expect(result.Name).To(Equal("my-space"))
 		})
 
+		It("GetSpace lists a security group bound to both running and staging once", func() {
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]resources.Space{{GUID: "my-space-guid", Name: "my-space"}},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetRunningSecurityGroupsReturns(
+				[]resources.SecurityGroup{{GUID: "sg-1", Name: "both"}},
+				ccv3.Warnings{},
+				nil,
+			)
+			fakeCloudControllerClient.GetStagingSecurityGroupsReturns(
+				[]resources.SecurityGroup{{GUID: "sg-1", Name: "both"}, {GUID: "sg-2", Name: "staging-only"}},
+				ccv3.Warnings{},
+				nil,
+			)
+
+			result := plugin_models.GetSpace_Model{}
+			Expect(client.Call("CliRpcCmd.GetSpace", "my-space", &result)).To(Succeed())
+
+			var guids []string
+			for _, sg := range result.SecurityGroups {
+				guids = append(guids, sg.Guid)
+			}
+			Expect(guids).To(Equal([]string{"sg-1", "sg-2"}))
+		})
+
 		Describe("quota limits", func() {
 			unset := func() *types.NullInt { return &types.NullInt{IsSet: false} }
 			set := func(v int) *types.NullInt { return &types.NullInt{IsSet: true, Value: v} }

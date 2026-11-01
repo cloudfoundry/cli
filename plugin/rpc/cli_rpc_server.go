@@ -721,6 +721,9 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 
 	// Deduplicate security groups (some may be both running and staging)
 	seenGroups := make(map[string]bool)
+	for _, sg := range runningSecurityGroups {
+		seenGroups[sg.GUID] = true
+	}
 	for _, sg := range stagingSecurityGroups {
 		if !seenGroups[sg.GUID] {
 			allSecurityGroups = append(allSecurityGroups, sg)
