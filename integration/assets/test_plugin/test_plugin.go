@@ -80,37 +80,37 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		result, _ := cliConnection.AccessToken()
 		fmt.Println("Done AccessToken:", result)
 	case "GetApp":
-		result, err := cliConnection.GetApp(args[1])
+		result, err := cliConnection.GetApp(args[1]) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetApp:", result)
 		fmt.Println("err:", err)
 	case "GetApps":
-		result, err := cliConnection.GetApps()
+		result, err := cliConnection.GetApps() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetApps:")
 		fmt.Printf("error: [%s], apps: [%+v]\n", err, result)
 	case "GetOrg":
-		result, err := cliConnection.GetOrg(args[1])
+		result, err := cliConnection.GetOrg(args[1]) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Printf("Done GetOrg: %+v\n", result)
 		fmt.Println("err:", err)
 	case "GetOrgs":
-		result, _ := cliConnection.GetOrgs()
+		result, _ := cliConnection.GetOrgs() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetOrgs:", result)
 	case "GetSpace":
-		result, _ := cliConnection.GetSpace(args[1])
+		result, _ := cliConnection.GetSpace(args[1]) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetSpace:", result)
 	case "GetSpaces":
-		result, _ := cliConnection.GetSpaces()
+		result, _ := cliConnection.GetSpaces() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Printf("Done GetSpaces: %+v\n", result)
 	case "GetOrgUsers":
-		result, _ := cliConnection.GetOrgUsers(args[1], args[2:]...)
+		result, _ := cliConnection.GetOrgUsers(args[1], args[2:]...) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetOrgUsers:", result)
 	case "GetSpaceUsers":
-		result, _ := cliConnection.GetSpaceUsers(args[1], args[2])
+		result, _ := cliConnection.GetSpaceUsers(args[1], args[2]) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetSpaceUsers:", result)
 	case "GetServices":
-		result, _ := cliConnection.GetServices()
+		result, _ := cliConnection.GetServices() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetServices:", result)
 	case "GetService":
-		result, _ := cliConnection.GetService(args[1])
+		result, _ := cliConnection.GetService(args[1]) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Done GetService:", result)
 	case "TestPluginCommandWithAlias", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF":
 		fmt.Println("You called Test Plugin Command With Alias!")

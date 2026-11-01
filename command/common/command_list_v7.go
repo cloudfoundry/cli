@@ -8,7 +8,6 @@ import (
 )
 
 var Commands commandList
-var ShouldFallbackToLegacy = false
 
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`

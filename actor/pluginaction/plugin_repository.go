@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/v8/actor/actionerror"
+	"code.cloudfoundry.org/cli/v8/api/plugin"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 )
 
@@ -62,6 +63,56 @@ func (actor Actor) IsPluginRepositoryRegistered(repositoryName string) bool {
 		}
 	}
 	return false
+}
+
+// RemovePluginRepository removes the registered repository whose name matches
+// repositoryName (trimmed, case-insensitive).
+func (actor Actor) RemovePluginRepository(repositoryName string) error {
+	repository, err := actor.GetPluginRepository(strings.TrimSpace(repositoryName))
+	if err != nil {
+		return err
+	}
+
+	actor.config.RemovePluginRepository(repository.Name)
+	return nil
+}
+
+// RepositoryPlugins lists the plugins available in a plugin repository.
+type RepositoryPlugins struct {
+	RepositoryName string
+	Plugins        []plugin.Plugin
+}
+
+// GetPluginsFromRepositories fetches the plugins of each repository, in order.
+// Repositories that cannot be fetched are skipped and reported as errors.
+func (actor Actor) GetPluginsFromRepositories(repositories []configv3.PluginRepository) ([]RepositoryPlugins, []error) {
+	var (
+		repositoryPlugins []RepositoryPlugins
+		errs              []error
+	)
+
+	for _, repository := range repositories {
+		repositoryURL := repository.URL
+		if repositoryURL == "http://plugins.cloudfoundry.org" {
+			repositoryURL = configv3.DefaultPluginRepoURL
+		}
+
+		pluginRepository, err := actor.client.GetPluginRepository(repositoryURL)
+		if err != nil {
+			errs = append(errs, actionerror.FetchingPluginInfoFromRepositoryError{
+				RepositoryName: repository.Name,
+				Err:            err,
+			})
+			continue
+		}
+
+		repositoryPlugins = append(repositoryPlugins, RepositoryPlugins{
+			RepositoryName: repository.Name,
+			Plugins:        pluginRepository.Plugins,
+		})
+	}
+
+	return repositoryPlugins, errs
 }
 
 func normalizeURLPath(rawURL string) (string, error) {

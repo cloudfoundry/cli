@@ -1,29 +1,34 @@
 package rpc
 
 import (
-	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/rpc"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
 
-	"code.cloudfoundry.org/cli/v8/cf/api"
-	"code.cloudfoundry.org/cli/v8/cf/commandregistry"
-	"code.cloudfoundry.org/cli/v8/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/v8/cf/terminal"
+	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"code.cloudfoundry.org/cli/v8/resources"
+	"code.cloudfoundry.org/cli/v8/util"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
 	"code.cloudfoundry.org/cli/v8/version"
 	"github.com/blang/semver/v4"
-
-	"code.cloudfoundry.org/cli/v8/cf/trace"
 )
 
-var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
+var (
+	ErrNoAPISet                 = errors.New("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint.")
+	ErrActorUnavailable         = errors.New("Cloud Controller access is not available in this context")
+	ErrCommandParserUnavailable = errors.New("core commands cannot be called in this context")
+)
 
 type CliRpcService struct {
 	listener net.Listener
@@ -34,53 +39,50 @@ type CliRpcService struct {
 }
 
 type CliRpcCmd struct {
-	PluginMetadata       *plugin.PluginMetadata
-	MetadataMutex        *sync.RWMutex
-	outputCapture        OutputCapture
-	terminalOutputSwitch TerminalOutputSwitch
-	cliConfig            coreconfig.Repository
-	repoLocator          api.RepositoryLocator
-	newCmdRunner         CommandRunner
-	outputBucket         *bytes.Buffer
-	logger               trace.Printer
-	stdout               io.Writer
+	PluginMetadata *plugin.PluginMetadata
+	MetadataMutex  *sync.RWMutex
+	outputDisabled bool
+	cliConfig      *configv3.Config
+	outputBucket   *util.SynchronizedBuffer
+	actor          *v7action.Actor
+	commandParser  CommandParser
+	commandUI      *ui.UI
+
+	// coreCommandMutex serializes core command runs and guards outputDisabled and
+	// outputBucket: net/rpc serves each plugin connection on its own goroutine.
+	coreCommandMutex sync.Mutex
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TerminalOutputSwitch
-
-type TerminalOutputSwitch interface {
-	DisableTerminalOutput(bool)
+type OutputInterceptor struct {
+	capturedOutput io.Writer
+	stdout         io.Writer
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OutputCapture
-
-type OutputCapture interface {
-	SetOutputBucket(io.Writer)
+func (oi *OutputInterceptor) Write(p []byte) (n int, err error) {
+	n, err = oi.capturedOutput.Write(p)
+	if oi.stdout != nil {
+		_, _ = oi.stdout.Write(p)
+	}
+	return n, err
 }
 
 func NewRpcService(
-	outputCapture OutputCapture,
-	terminalOutputSwitch TerminalOutputSwitch,
-	cliConfig coreconfig.Repository,
-	repoLocator api.RepositoryLocator,
-	newCmdRunner CommandRunner,
-	logger trace.Printer,
-	w io.Writer,
+	cliConfig *configv3.Config,
 	rpcServer *rpc.Server,
+	actor *v7action.Actor,
+	commandParser CommandParser,
+	commandUI *ui.UI,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
-			PluginMetadata:       &plugin.PluginMetadata{},
-			MetadataMutex:        &sync.RWMutex{},
-			outputCapture:        outputCapture,
-			terminalOutputSwitch: terminalOutputSwitch,
-			cliConfig:            cliConfig,
-			repoLocator:          repoLocator,
-			newCmdRunner:         newCmdRunner,
-			logger:               logger,
-			outputBucket:         &bytes.Buffer{},
-			stdout:               w,
+			PluginMetadata: &plugin.PluginMetadata{},
+			MetadataMutex:  &sync.RWMutex{},
+			outputBucket:   &util.SynchronizedBuffer{},
+			cliConfig:      cliConfig,
+			actor:          actor,
+			commandParser:  commandParser,
+			commandUI:      commandUI,
 		},
 	}
 
@@ -161,113 +163,167 @@ func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, re
 }
 
 func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
-	cmd.terminalOutputSwitch.DisableTerminalOutput(disable)
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
+	cmd.outputDisabled = disable
 	*retVal = true
 	return nil
 }
 
 func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	var err error
-	cmdRegistry := commandregistry.Commands
-
-	cmd.outputBucket = &bytes.Buffer{}
-	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
-
-	if cmdRegistry.CommandExists(args[0]) {
-		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-
-		// set deps objs to be the one used by all other commands
-		// once all commands are converted, we can make fresh deps for each command run
-		deps.Config = cmd.cliConfig
-		deps.RepoLocator = cmd.repoLocator
-
-		// set command ui's TeePrinter to be the one used by RpcService, for output to be captured
-		deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
-
-		err = cmd.newCmdRunner.Command(args, deps, false)
-	} else {
+	if cmd.commandParser == nil {
 		*retVal = false
-		return nil
+		return ErrCommandParserUnavailable
 	}
 
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
+	cmd.outputBucket.Reset()
+	stdout := &OutputInterceptor{
+		capturedOutput: cmd.outputBucket,
+	}
+	stderr := stdout
+	if !cmd.outputDisabled && cmd.commandUI != nil {
+		stdout.stdout = cmd.commandUI.GetOut()
+		stderr = &OutputInterceptor{
+			capturedOutput: cmd.outputBucket,
+			stdout:         cmd.commandUI.GetErr(),
+		}
+	}
+
+	// capture output for plugin
+	pluginUI, err := ui.NewPluginUI(cmd.cliConfig, stdout, stderr)
 	if err != nil {
 		*retVal = false
 		return err
+	}
+
+	// Use the command parser to execute the command
+	exitCode, err := cmd.commandParser.ParseCommandFromArgs(pluginUI, args)
+	if err != nil {
+		*retVal = false
+		return err
+	}
+
+	if exitCode != 0 {
+		*retVal = false
+		return fmt.Errorf("command exited with code %d", exitCode)
 	}
 
 	*retVal = true
 	return nil
 }
 
+// GetOutputAndReset returns the output of the latest core command. The name is a
+// misnomer kept for wire compatibility: like upstream, it does not reset the
+// output, which is only cleared when the next core command starts.
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	v := strings.TrimSuffix(cmd.outputBucket.String(), "\n")
 	*retVal = strings.Split(v, "\n")
 	return nil
 }
 
+func (cmd *CliRpcCmd) getActor() (*v7action.Actor, error) {
+	if cmd.actor != nil {
+		return cmd.actor, nil
+	}
+	if cmd.cliConfig == nil || cmd.cliConfig.Target() == "" {
+		return nil, ErrNoAPISet
+	}
+	return nil, ErrActorUnavailable
+}
+
+// displayWarnings writes Cloud Controller warnings to stderr, keeping the
+// plugin's stdout free of CLI output (legacy Get* calls printed nothing).
+func (cmd *CliRpcCmd) displayWarnings(warnings []string) {
+	if cmd.commandUI != nil {
+		cmd.commandUI.DisplayWarnings(warnings)
+	}
+}
+
 func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
-	retVal.Name = cmd.cliConfig.OrganizationFields().Name
-	retVal.Guid = cmd.cliConfig.OrganizationFields().GUID
+	org := cmd.cliConfig.TargetedOrganization()
+	retVal.Name = org.Name
+	retVal.Guid = org.GUID
 	return nil
 }
 
 func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
-	retVal.Name = cmd.cliConfig.SpaceFields().Name
-	retVal.Guid = cmd.cliConfig.SpaceFields().GUID
+	space := cmd.cliConfig.TargetedSpace()
+	retVal.Name = space.Name
+	retVal.Guid = space.GUID
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.Username()
+	username, err := cmd.cliConfig.CurrentUserName()
+	if err != nil {
+		return err
+	}
+	*retVal = username
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.UserGUID()
+	user, err := cmd.cliConfig.CurrentUser()
+	if err != nil {
+		return err
+	}
+	*retVal = user.GUID
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.UserEmail()
+	user, err := cmd.cliConfig.CurrentUser()
+	if err != nil {
+		*retVal = ""
+		return nil
+	}
+	*retVal = user.Email
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.IsLoggedIn()
+	*retVal = cmd.cliConfig.AccessToken() != ""
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) IsSSLDisabled(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.IsSSLDisabled()
+	*retVal = cmd.cliConfig.SkipSSLValidation()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasOrganization(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasOrganization()
+	*retVal = cmd.cliConfig.HasTargetedOrganization()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasSpace()
+	*retVal = cmd.cliConfig.HasTargetedSpace()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.APIEndpoint()
+	*retVal = cmd.cliConfig.Target()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
-	*retVal = cmd.cliConfig.HasAPIEndpoint()
+	*retVal = cmd.cliConfig.Target() != ""
 
 	return nil
 }
@@ -285,159 +341,474 @@ func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.DopplerEndpoint()
+	*retVal = cmd.cliConfig.ConfigFile.DopplerEndpoint
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
-	token, err := cmd.repoLocator.GetAuthenticationRepository().RefreshAuthToken()
+	if cmd.actor == nil {
+		*retVal = cmd.cliConfig.AccessToken()
+		return nil
+	}
+
+	accessTokenBefore := cmd.cliConfig.AccessToken()
+	refreshTokenBefore := cmd.cliConfig.RefreshToken()
+
+	token, err := cmd.actor.RefreshAccessToken()
 	if err != nil {
 		return err
 	}
 
 	*retVal = token
 
+	// Persist right away: with refresh-token rotation, the token stored on disk
+	// would otherwise become invalid for long-running plugins which could refresh the access token during execution
+	if cmd.cliConfig.AccessToken() != accessTokenBefore || cmd.cliConfig.RefreshToken() != refreshTokenBefore {
+		if err := cmd.cliConfig.WriteConfig(); err != nil {
+			return fmt.Errorf("persisting refreshed token: %w", err)
+		}
+	}
+
 	return nil
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Application = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
+	// Get detailed app summary; withObfuscatedValues fetches each process
+	// individually, so the start command is not redacted
+	summary, warnings, err := actor.GetDetailedAppSummary(appName, spaceGUID, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Get service bindings for the app
+	serviceBindings, ccWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{summary.GUID}},
+	)
+	cmd.displayWarnings(ccWarnings)
+	if err != nil {
+		return err
+	}
+
+	// Resolve the bound service instances (legacy reported instance names, one
+	// entry per instance, while v3 can have several bindings per instance)
+	var serviceInstanceGUIDs []string
+	seenInstances := make(map[string]bool)
+	for _, binding := range serviceBindings {
+		if !seenInstances[binding.ServiceInstanceGUID] {
+			seenInstances[binding.ServiceInstanceGUID] = true
+			serviceInstanceGUIDs = append(serviceInstanceGUIDs, binding.ServiceInstanceGUID)
+		}
+	}
+
+	var serviceInstances []resources.ServiceInstance
+	if len(serviceInstanceGUIDs) > 0 {
+		instances, _, ccWarnings, err := actor.CloudControllerClient.GetServiceInstances(
+			ccv3.Query{Key: ccv3.GUIDFilter, Values: serviceInstanceGUIDs},
+		)
+		cmd.displayWarnings(ccWarnings)
+		if err != nil {
+			return err
+		}
+
+		instancesByGUID := make(map[string]resources.ServiceInstance, len(instances))
+		for _, instance := range instances {
+			instancesByGUID[instance.GUID] = instance
+		}
+		for _, guid := range serviceInstanceGUIDs {
+			if instance, found := instancesByGUID[guid]; found {
+				serviceInstances = append(serviceInstances, instance)
+			}
+		}
+	}
+
+	// Get stack information
+	var stack resources.Stack
+	if summary.CurrentDroplet.Stack != "" {
+		stacks, ccWarnings, err := actor.CloudControllerClient.GetStacks(
+			ccv3.Query{Key: ccv3.NameFilter, Values: []string{summary.CurrentDroplet.Stack}},
+		)
+		cmd.displayWarnings(ccWarnings)
+		if err != nil {
+			return err
+		}
+		if len(stacks) > 0 {
+			stack = stacks[0]
+		}
+	}
+
+	// User-provided environment variables; roles without access to them
+	// (e.g. space auditors) still get the rest of the app
+	environment, ccWarnings, err := actor.CloudControllerClient.GetApplicationEnvironment(summary.GUID)
+	cmd.displayWarnings(ccWarnings)
+	if err != nil {
+		if _, forbidden := err.(ccerror.ForbiddenError); !forbidden {
+			return err
+		}
+	}
+
+	// Populate the plugin model
+	*retVal = populateAppModel(summary, serviceInstances, stack, environment.EnvironmentVariables)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.AppsSummary = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
+	// Get app summaries for the space (omitStats=false to get instances)
+	summaries, warnings, err := actor.GetAppSummariesForSpace(spaceGUID, "", false)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateAppsModel(summaries)
+
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Organizations = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	orgs, warnings, err := actor.GetOrganizations("")
+	if err != nil {
+		return err
+	}
 
-	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateOrgsModel(orgs)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Spaces = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return fmt.Errorf("no organization targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
+	spaces, warnings, err := actor.GetOrganizationSpaces(orgGUID)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpacesModel(spaces)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Services = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
+	services, warnings, err := actor.GetServiceInstancesForSpace(spaceGUID, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateServicesModel(services)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.OrgUsers = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	if len(args) == 0 {
+		return fmt.Errorf("organization name required")
+	}
+	orgName := args[0]
 
-	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
+	// Get org GUID from name
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from org lookup
+	cmd.displayWarnings(warnings)
+
+	// Get users by role type
+	usersByRole, warnings, err := actor.GetOrgUsersByRoleType(org.GUID)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	roles := orgUsersDefaultRoles
+	for _, arg := range args[1:] {
+		if arg == "-a" {
+			roles = orgUsersAllFlagRoles
+			break
+		}
+	}
+
+	*retVal = populateOrgUsersModel(usersByRole, roles)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.SpaceUsers = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	if len(args) < 2 {
+		return fmt.Errorf("organization and space names required")
+	}
+	orgName := args[0]
+	spaceName := args[1]
 
-	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
+	// Get org GUID from name
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from org lookup
+	cmd.displayWarnings(warnings)
+
+	// Get space GUID from name
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	if err != nil {
+		return err
+	}
+
+	// Handle warnings from space lookup
+	cmd.displayWarnings(warnings)
+
+	// Get users by role type
+	usersByRole, warnings, err := actor.GetSpaceUsersByRoleType(space.GUID)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpaceUsersModel(usersByRole)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Organization = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	// 1. Get the organization by name
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
 
-	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
+	cmd.displayWarnings(warnings)
+
+	// 2. Get organization quota
+	var quota resources.OrganizationQuota
+	if org.QuotaGUID != "" {
+		var ccv3Warnings ccv3.Warnings
+		quota, ccv3Warnings, err = actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+		if err != nil {
+			return err
+		}
+		cmd.displayWarnings(ccv3Warnings)
+	}
+
+	// 3. Get organization spaces
+	spaces, warnings, err := actor.GetOrganizationSpaces(org.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 4. Get organization domains
+	domains, warnings, err := actor.GetOrganizationDomains(org.GUID, "")
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 5. Get space quotas for the organization
+	spaceQuotas, warnings, err := actor.GetSpaceQuotasByOrgGUID(org.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// Populate plugin model using mapping function
+	*retVal = populateOrgModel(org, quota, spaces, domains, spaceQuotas)
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Space = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	// Get the targeted organization GUID
+	orgGUID := cmd.cliConfig.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return fmt.Errorf("no organization targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
+	// 1. Get the space by name and organization
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 2. Get organization info
+	org, warnings, err := actor.GetOrganizationByGUID(orgGUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 3. Get applications in the space
+	apps, warnings, err := actor.GetApplicationsBySpace(space.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 4. Get service instances in the space
+	serviceInstances, warnings, err := actor.GetServiceInstancesForSpace(space.GUID, false)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 5. Get domains for the organization (spaces inherit org domains)
+	domains, warnings, err := actor.GetOrganizationDomains(orgGUID, "")
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(warnings)
+
+	// 6. Get space quota (if applied)
+	var spaceQuota resources.SpaceQuota
+	if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
+		var ccv3Warnings ccv3.Warnings
+		spaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		if err != nil {
+			return err
+		}
+		cmd.displayWarnings(ccv3Warnings)
+	}
+
+	// 7. Get security groups (both running and staging)
+	var allSecurityGroups []resources.SecurityGroup
+
+	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(ccv3Warnings)
+	allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
+
+	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.displayWarnings(ccv3Warnings)
+
+	// Deduplicate security groups (some may be both running and staging)
+	seenGroups := make(map[string]bool)
+	for _, sg := range runningSecurityGroups {
+		seenGroups[sg.GUID] = true
+	}
+	for _, sg := range stagingSecurityGroups {
+		if !seenGroups[sg.GUID] {
+			allSecurityGroups = append(allSecurityGroups, sg)
+			seenGroups[sg.GUID] = true
+		}
+	}
+
+	// Populate plugin model using mapping function
+	*retVal = populateSpaceModel(space, orgGUID, org.Name, apps, serviceInstances, domains, spaceQuota, allSecurityGroups)
+	return nil
 }
 
-func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
+func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_models.GetService_Model) error {
+	actor, err := cmd.getActor()
+	if err != nil {
+		return err
+	}
 
-	// set deps objs to be the one used by all other commands
-	// once all commands are converted, we can make fresh deps for each command run
-	deps.Config = cmd.cliConfig
-	deps.RepoLocator = cmd.repoLocator
-	deps.PluginModels.Service = retVal
-	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	spaceGUID := cmd.cliConfig.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return fmt.Errorf("no space targeted")
+	}
 
-	return cmd.newCmdRunner.Command([]string{"service", serviceInstance}, deps, true)
+	// Query to include service plan and service offering details
+	queries := []ccv3.Query{
+		{Key: ccv3.FieldsServicePlan, Values: []string{"name", "guid"}},
+		{Key: ccv3.FieldsServicePlanServiceOffering, Values: []string{"name", "guid", "documentation_url"}},
+	}
+
+	serviceInstance, includedResources, warnings, err := actor.CloudControllerClient.GetServiceInstanceByNameAndSpace(
+		serviceInstanceName,
+		spaceGUID,
+		queries...,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Log warnings if any
+	cmd.displayWarnings(warnings)
+
+	// Populate the plugin model
+	populateServiceModel(retVal, serviceInstance, includedResources)
+	return nil
 }

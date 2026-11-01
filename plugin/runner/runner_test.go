@@ -1,0 +1,176 @@
+package runner_test
+
+import (
+	"code.cloudfoundry.org/cli/v8/plugin/runner"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
+	"code.cloudfoundry.org/cli/v8/util/ui"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+)
+
+var _ = Describe("PluginRunner", func() {
+	var (
+		config    *configv3.Config
+		commandUI *ui.UI
+		plugin    configv3.Plugin
+		out       *Buffer
+		cfHome    string
+	)
+
+	BeforeEach(func() {
+		// Run writes the config on exit; never touch the developer's real ~/.cf
+		cfHome = GinkgoT().TempDir()
+		GinkgoT().Setenv("CF_HOME", cfHome)
+
+		out = NewBuffer()
+		commandUI = ui.NewTestUI(nil, out, NewBuffer())
+
+		config = &configv3.Config{
+			ConfigFile: configv3.JSONConfig{
+				ConfigVersion: 3,
+				Target:        "https://api.example.com",
+				PluginRepositories: []configv3.PluginRepository{
+					{
+						Name: "CF-Community",
+						URL:  "https://plugins.cloudfoundry.org",
+					},
+				},
+			},
+		}
+
+		plugin = configv3.Plugin{
+			Name:     "test-plugin",
+			Location: "/path/to/test-plugin",
+			Version: configv3.PluginVersion{
+				Major: 1,
+				Minor: 0,
+				Build: 0,
+			},
+			Commands: []configv3.PluginCommand{
+				{
+					Name:     "test-command",
+					Alias:    "tc",
+					HelpText: "A test command",
+					UsageDetails: configv3.PluginUsageDetails{
+						Usage: "cf test-command [options]",
+					},
+				},
+				{
+					Name:     "another-command",
+					HelpText: "Another test command",
+					UsageDetails: configv3.PluginUsageDetails{
+						Usage: "cf another-command",
+					},
+				},
+			},
+		}
+	})
+
+	Describe("NewPluginRunner", func() {
+		It("creates a new PluginRunner instance", func() {
+			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, nil)
+			Expect(pluginRunner).ToNot(BeNil())
+		})
+
+		It("accepts nil config", func() {
+			pluginRunner := runner.NewPluginRunner(nil, commandUI, plugin, nil)
+			Expect(pluginRunner).ToNot(BeNil())
+		})
+
+		It("accepts nil UI", func() {
+			pluginRunner := runner.NewPluginRunner(config, nil, plugin, nil)
+			Expect(pluginRunner).ToNot(BeNil())
+		})
+
+		It("accepts empty plugin", func() {
+			emptyPlugin := configv3.Plugin{}
+			pluginRunner := runner.NewPluginRunner(config, commandUI, emptyPlugin, nil)
+			Expect(pluginRunner).ToNot(BeNil())
+		})
+	})
+
+	Describe("Run", func() {
+		var pluginRunner runner.PluginRunner
+
+		BeforeEach(func() {
+			pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+		})
+
+		Context("when the plugin binary does not exist", func() {
+			It("returns ErrFailed", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(runner.ErrFailed))
+			})
+		})
+
+		Context("when the plugin binary path is empty", func() {
+			BeforeEach(func() {
+				plugin.Location = ""
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+			})
+
+			It("returns an error", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when args are empty", func() {
+			It("can still execute (plugin determines behavior)", func() {
+				// This will fail because the binary doesn't exist, but it tests
+				// that empty args don't cause a panic
+				err := pluginRunner.Run([]string{})
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(runner.ErrFailed))
+			})
+		})
+
+		Context("when no API endpoint is targeted", func() {
+			BeforeEach(func() {
+				config.ConfigFile.Target = ""
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+			})
+
+			It("still launches the plugin binary instead of failing on the missing target", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(Equal(runner.ErrFailed))
+			})
+		})
+
+		Context("when the plugin exits", func() {
+			BeforeEach(func() {
+				config.ConfigFile.ConfigVersion = configv3.CurrentConfigVersion
+				config.ConfigFile.AccessToken = "bearer token-refreshed-during-plugin-run"
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+			})
+
+			It("writes the config, even when the plugin fails", func() {
+				err := pluginRunner.Run([]string{"test-command"})
+				Expect(err).To(Equal(runner.ErrFailed))
+
+				persisted, err := configv3.LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer token-refreshed-during-plugin-run"))
+			})
+		})
+
+		// Note: Integration tests with actual plugin binaries would require:
+		// 1. A test plugin binary to be compiled
+		// 2. Proper RPC communication setup
+		// 3. Mock RPC server responses
+		// These are typically done in integration test suites with fixture binaries
+	})
+
+	DescribeTable("CommandArgs",
+		func(args []string, expected []string) {
+			Expect(runner.CommandArgs(args)).To(Equal(expected))
+		},
+		Entry("command first", []string{"my-cmd", "-f", "x"}, []string{"my-cmd", "-f", "x"}),
+		Entry("short global flag before the command", []string{"-v", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
+		Entry("long global flags before the command", []string{"--verbose", "-v", "my-cmd", "--opt", "val"}, []string{"my-cmd", "--opt", "val"}),
+		Entry("flags only", []string{"-v", "--help"}, nil),
+		Entry("no arguments", []string{}, nil),
+	)
+})
