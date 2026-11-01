@@ -13,6 +13,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
 	"code.cloudfoundry.org/cli/v8/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/api/uaa"
@@ -411,24 +412,20 @@ var _ = Describe("Server", func() {
 				nil,
 			)
 
-			fakeCloudControllerClient.GetApplicationProcessesReturns(
-				[]resources.Process{
-					{
-						GUID:                "fake-process-guid",
-						Type:                "web",
-						Command:             types.FilteredString{IsSet: true, Value: "start-command"},
-						MemoryInMB:          types.NullUint64{IsSet: true, Value: 1024},
-						DiskInMB:            types.NullUint64{IsSet: true, Value: 512},
-						Instances:           types.NullInt{IsSet: true, Value: 2},
-						HealthCheckTimeout:  60,
-						HealthCheckType:     constant.HTTP,
-						HealthCheckEndpoint: "/health",
-						AppGUID:             "fake-app-guid",
-					},
-				},
-				ccv3.Warnings{},
-				nil,
-			)
+			webProcess := resources.Process{
+				GUID:                "fake-process-guid",
+				Type:                "web",
+				Command:             types.FilteredString{IsSet: true, Value: "start-command"},
+				MemoryInMB:          types.NullUint64{IsSet: true, Value: 1024},
+				DiskInMB:            types.NullUint64{IsSet: true, Value: 512},
+				Instances:           types.NullInt{IsSet: true, Value: 2},
+				HealthCheckTimeout:  60,
+				HealthCheckType:     constant.HTTP,
+				HealthCheckEndpoint: "/health",
+				AppGUID:             "fake-app-guid",
+			}
+			fakeCloudControllerClient.GetApplicationProcessesReturns([]resources.Process{webProcess}, ccv3.Warnings{}, nil)
+			fakeCloudControllerClient.GetProcessReturns(webProcess, ccv3.Warnings{}, nil)
 
 			fakeCloudControllerClient.GetProcessInstancesReturns(
 				[]ccv3.ProcessInstance{
@@ -822,6 +819,67 @@ var _ = Describe("Server", func() {
 			Expect(result[1].RunningInstances).To(Equal(0))
 		})
 
+		Describe("GetApp start command and environment variables", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{{GUID: "fake-app-guid", Name: "fake-app", State: constant.ApplicationStarted, SpaceGUID: "test-space-guid"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetApplicationProcessesReturns(
+					[]resources.Process{{GUID: "p", Type: "web", Command: types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"}}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetProcessReturns(
+					resources.Process{GUID: "p", Type: "web", Command: types.FilteredString{IsSet: true, Value: "bundle exec rackup"}},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			It("returns the unredacted start command", func() {
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "fake-app", &result)).To(Succeed())
+
+				Expect(result.Command).To(Equal("bundle exec rackup"))
+				Expect(fakeCloudControllerClient.GetProcessCallCount()).To(Equal(1))
+			})
+
+			It("returns the user-provided environment variables", func() {
+				fakeCloudControllerClient.GetApplicationEnvironmentReturns(
+					ccv3.Environment{EnvironmentVariables: map[string]interface{}{"FOO": "bar"}},
+					ccv3.Warnings{},
+					nil,
+				)
+
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "fake-app", &result)).To(Succeed())
+
+				Expect(fakeCloudControllerClient.GetApplicationEnvironmentArgsForCall(0)).To(Equal("fake-app-guid"))
+				Expect(result.EnvironmentVars).To(Equal(map[string]interface{}{"FOO": "bar"}))
+			})
+
+			It("still succeeds when access to the environment is forbidden", func() {
+				fakeCloudControllerClient.GetApplicationEnvironmentReturns(ccv3.Environment{}, ccv3.Warnings{}, ccerror.ForbiddenError{})
+
+				result := plugin_models.GetAppModel{}
+				Expect(client.Call("CliRpcCmd.GetApp", "fake-app", &result)).To(Succeed())
+
+				Expect(fakeCloudControllerClient.GetApplicationEnvironmentCallCount()).To(Equal(1))
+				Expect(result.Name).To(Equal("fake-app"))
+				Expect(result.EnvironmentVars).To(BeEmpty())
+			})
+
+			It("returns other errors from fetching the environment", func() {
+				fakeCloudControllerClient.GetApplicationEnvironmentReturns(ccv3.Environment{}, ccv3.Warnings{}, errors.New("boom"))
+
+				result := plugin_models.GetAppModel{}
+				err := client.Call("CliRpcCmd.GetApp", "fake-app", &result)
+				Expect(err).To(MatchError(ContainSubstring("boom")))
+			})
+		})
+
 		Describe("when an app has no web process", func() {
 			workerProcess := resources.Process{
 				GUID:       "worker-process-guid",
@@ -847,6 +905,7 @@ var _ = Describe("Server", func() {
 
 			It("GetApp falls back to the first process", func() {
 				fakeCloudControllerClient.GetApplicationProcessesReturns([]resources.Process{workerProcess}, ccv3.Warnings{}, nil)
+				fakeCloudControllerClient.GetProcessReturns(workerProcess, ccv3.Warnings{}, nil)
 
 				result := plugin_models.GetAppModel{}
 				Expect(client.Call("CliRpcCmd.GetApp", "worker-app", &result)).To(Succeed())

@@ -380,12 +380,14 @@ func populateAppModel(
 	summary v7action.DetailedApplicationSummary,
 	serviceBindings []resources.ServiceCredentialBinding,
 	stack resources.Stack,
+	envVars map[string]interface{},
 ) plugin_models.GetAppModel {
 	model := plugin_models.GetAppModel{
-		Guid:      summary.GUID,
-		Name:      summary.Name,
-		State:     strings.ToLower(string(summary.State)),
-		SpaceGuid: summary.SpaceGUID,
+		EnvironmentVars: envVars,
+		Guid:            summary.GUID,
+		Name:            summary.Name,
+		State:           strings.ToLower(string(summary.State)),
+		SpaceGuid:       summary.SpaceGUID,
 	}
 
 	process := primaryProcess(summary.ProcessSummaries)

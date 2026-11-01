@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
+	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/v8/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/v8/plugin"
@@ -384,8 +385,9 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 		return fmt.Errorf("no space targeted")
 	}
 
-	// Get detailed app summary
-	summary, warnings, err := actor.GetDetailedAppSummary(appName, spaceGUID, false)
+	// Get detailed app summary; withObfuscatedValues fetches each process
+	// individually, so the start command is not redacted
+	summary, warnings, err := actor.GetDetailedAppSummary(appName, spaceGUID, true)
 	if err != nil {
 		return err
 	}
@@ -416,8 +418,18 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 		}
 	}
 
+	// User-provided environment variables; roles without access to them
+	// (e.g. space auditors) still get the rest of the app
+	environment, ccWarnings, err := actor.CloudControllerClient.GetApplicationEnvironment(summary.GUID)
+	cmd.displayWarnings(ccWarnings)
+	if err != nil {
+		if _, forbidden := err.(ccerror.ForbiddenError); !forbidden {
+			return err
+		}
+	}
+
 	// Populate the plugin model
-	*retVal = populateAppModel(summary, serviceBindings, stack)
+	*retVal = populateAppModel(summary, serviceBindings, stack, environment.EnvironmentVariables)
 	return nil
 }
 
