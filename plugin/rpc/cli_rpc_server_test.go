@@ -756,80 +756,87 @@ var _ = Describe("Server", func() {
 			Expect(result[1].Name).To(Equal("space-2"))
 		})
 
-		It("calls GetOrgUsers() ", func() {
-			// Setup fake actor to return org and users
-			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]resources.Organization{
-					{GUID: "org-guid", Name: "orgName1"},
-				},
-				ccv3.Warnings{},
-				nil,
-			)
-			fakeCloudControllerClient.GetRolesReturns(
-				[]resources.Role{
-					{GUID: "role-1-guid", Type: "organization_manager"},
-					{GUID: "role-2-guid", Type: "organization_auditor"},
-				},
-				ccv3.IncludedResources{
-					Users: []resources.User{
-						{GUID: "user-1-guid", Username: "user-1"},
-						{GUID: "user-2-guid", Username: "user-2"},
+		Describe("GetOrgUsers and GetSpaceUsers", func() {
+			returnRoles := func(roles ...resources.Role) {
+				fakeCloudControllerClient.GetRolesReturns(
+					roles,
+					ccv3.IncludedResources{
+						Users: []resources.User{
+							{GUID: "u1", Username: "user-1"},
+							{GUID: "u2", Username: "user-2"},
+							{GUID: "u3", Username: "user-3"},
+						},
 					},
-				},
-				ccv3.Warnings{},
-				nil,
-			)
+					ccv3.Warnings{},
+					nil,
+				)
+			}
 
-			result := []plugin_models.GetOrgUsers_Model{}
-			args := []string{"orgName1", "-a"}
-			err = client.Call("CliRpcCmd.GetOrgUsers", args, &result)
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]resources.Organization{{GUID: "org-guid", Name: "my-org"}},
+					ccv3.Warnings{},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]resources.Space{{GUID: "space-guid", Name: "my-space"}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
 
-			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(BeNumerically(">=", 1))
-			Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
-			Expect(len(result)).To(BeNumerically(">=", 1))
-		})
+			When("listing org users", func() {
+				BeforeEach(func() {
+					returnRoles(
+						resources.Role{Type: constant.OrgManagerRole, UserGUID: "u1"},
+						resources.Role{Type: constant.OrgAuditorRole, UserGUID: "u1"},
+						resources.Role{Type: constant.OrgUserRole, UserGUID: "u2"},
+						resources.Role{Type: constant.OrgBillingManagerRole, UserGUID: "u3"},
+					)
+				})
 
-		It("calls GetSpaceUsers() ", func() {
-			// Setup fake actor to return org, space, and users
-			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]resources.Organization{
-					{GUID: "org-guid", Name: "orgName1"},
-				},
-				ccv3.Warnings{},
-				nil,
-			)
-			fakeCloudControllerClient.GetSpacesReturns(
-				[]resources.Space{
-					{GUID: "space-guid", Name: "spaceName1"},
-				},
-				ccv3.IncludedResources{},
-				ccv3.Warnings{},
-				nil,
-			)
-			fakeCloudControllerClient.GetRolesReturns(
-				[]resources.Role{
-					{GUID: "role-1-guid", Type: "space_manager"},
-					{GUID: "role-2-guid", Type: "space_developer"},
-				},
-				ccv3.IncludedResources{
-					Users: []resources.User{
-						{GUID: "user-1-guid", Username: "user-1"},
-						{GUID: "user-2-guid", Username: "user-2"},
-					},
-				},
-				ccv3.Warnings{},
-				nil,
-			)
+				It("returns managers, billing managers and auditors with legacy role names, in legacy order", func() {
+					result := []plugin_models.GetOrgUsers_Model{}
+					err := client.Call("CliRpcCmd.GetOrgUsers", []string{"my-org"}, &result)
+					Expect(err).ToNot(HaveOccurred())
 
-			result := []plugin_models.GetSpaceUsers_Model{}
-			args := []string{"orgName1", "spaceName1"}
-			err = client.Call("CliRpcCmd.GetSpaceUsers", args, &result)
+					Expect(result).To(Equal([]plugin_models.GetOrgUsers_Model{
+						{Guid: "u1", Username: "user-1", Roles: []string{"RoleOrgManager", "RoleOrgAuditor"}},
+						{Guid: "u3", Username: "user-3", Roles: []string{"RoleBillingManager"}},
+					}))
+				})
 
-			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(BeNumerically(">=", 1))
-			Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
-			Expect(len(result)).To(BeNumerically(">=", 1))
+				It("returns only org users with -a", func() {
+					result := []plugin_models.GetOrgUsers_Model{}
+					err := client.Call("CliRpcCmd.GetOrgUsers", []string{"my-org", "-a"}, &result)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(result).To(Equal([]plugin_models.GetOrgUsers_Model{
+						{Guid: "u2", Username: "user-2", Roles: []string{"RoleOrgUser"}},
+					}))
+				})
+			})
+
+			When("listing space users", func() {
+				BeforeEach(func() {
+					returnRoles(
+						resources.Role{Type: constant.SpaceDeveloperRole, UserGUID: "u1"},
+						resources.Role{Type: constant.SpaceManagerRole, UserGUID: "u1"},
+						resources.Role{Type: constant.SpaceSupporterRole, UserGUID: "u2"},
+					)
+				})
+
+				It("maps legacy role names in legacy order and omits space supporters", func() {
+					result := []plugin_models.GetSpaceUsers_Model{}
+					err := client.Call("CliRpcCmd.GetSpaceUsers", []string{"my-org", "my-space"}, &result)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(result).To(Equal([]plugin_models.GetSpaceUsers_Model{
+						{Guid: "u1", Username: "user-1", Roles: []string{"RoleSpaceManager", "RoleSpaceDeveloper"}},
+					}))
+				})
+			})
 		})
 
 		It("calls GetService() with 'serviceInstance' as argument", func() {

@@ -98,66 +98,76 @@ func populateServicesModel(services []v7action.ServiceInstance) []plugin_models.
 	return models
 }
 
-// populateOrgUsersModel maps v3 User resources by role type to plugin models
-func populateOrgUsersModel(usersByRole map[constant.RoleType][]resources.User) []plugin_models.GetOrgUsers_Model {
-	// Create a map to deduplicate users by GUID
-	userMap := make(map[string]*plugin_models.GetOrgUsers_Model)
+// legacyRoleNames maps v3 role types to the role names legacy plugins received
+// (cf/models.Role.ToString). space_supporter has no legacy equivalent.
+var legacyRoleNames = map[constant.RoleType]string{
+	constant.OrgUserRole:           "RoleOrgUser",
+	constant.OrgManagerRole:        "RoleOrgManager",
+	constant.OrgBillingManagerRole: "RoleBillingManager",
+	constant.OrgAuditorRole:        "RoleOrgAuditor",
+	constant.SpaceManagerRole:      "RoleSpaceManager",
+	constant.SpaceDeveloperRole:    "RoleSpaceDeveloper",
+	constant.SpaceAuditorRole:      "RoleSpaceAuditor",
+}
 
-	// Iterate through each role type and its users
-	for roleType, users := range usersByRole {
-		roleName := string(roleType)
-		for _, user := range users {
-			if existing, found := userMap[user.GUID]; found {
-				// User already exists, add the role
-				existing.Roles = append(existing.Roles, roleName)
-			} else {
-				// New user, create entry
-				userMap[user.GUID] = &plugin_models.GetOrgUsers_Model{
-					Guid:     user.GUID,
-					Username: user.Username,
-					IsAdmin:  false, // v3 API doesn't provide this info in role listing
-					Roles:    []string{roleName},
-				}
+// Role selections and order of the legacy org-users / space-users commands.
+var (
+	orgUsersDefaultRoles = []constant.RoleType{constant.OrgManagerRole, constant.OrgBillingManagerRole, constant.OrgAuditorRole}
+	orgUsersAllFlagRoles = []constant.RoleType{constant.OrgUserRole}
+	spaceUsersRoles      = []constant.RoleType{constant.SpaceManagerRole, constant.SpaceDeveloperRole, constant.SpaceAuditorRole}
+)
+
+type userWithRoles struct {
+	user  resources.User
+	roles []string
+}
+
+// collectUsersByRoles walks the given roles in order and their users in API
+// order, returning each user once with its legacy role names in that order.
+func collectUsersByRoles(usersByRole map[constant.RoleType][]resources.User, roles []constant.RoleType) []userWithRoles {
+	var result []userWithRoles
+	indexByGUID := make(map[string]int)
+
+	for _, roleType := range roles {
+		roleName := legacyRoleNames[roleType]
+		for _, user := range usersByRole[roleType] {
+			if i, found := indexByGUID[user.GUID]; found {
+				result[i].roles = append(result[i].roles, roleName)
+				continue
 			}
+			indexByGUID[user.GUID] = len(result)
+			result = append(result, userWithRoles{user: user, roles: []string{roleName}})
 		}
-	}
-
-	// Convert map to slice
-	result := make([]plugin_models.GetOrgUsers_Model, 0, len(userMap))
-	for _, user := range userMap {
-		result = append(result, *user)
 	}
 	return result
 }
 
-// populateSpaceUsersModel maps v3 User resources by role type to plugin models
-func populateSpaceUsersModel(usersByRole map[constant.RoleType][]resources.User) []plugin_models.GetSpaceUsers_Model {
-	// Create a map to deduplicate users by GUID
-	userMap := make(map[string]*plugin_models.GetSpaceUsers_Model)
-
-	// Iterate through each role type and its users
-	for roleType, users := range usersByRole {
-		roleName := string(roleType)
-		for _, user := range users {
-			if existing, found := userMap[user.GUID]; found {
-				// User already exists, add the role
-				existing.Roles = append(existing.Roles, roleName)
-			} else {
-				// New user, create entry
-				userMap[user.GUID] = &plugin_models.GetSpaceUsers_Model{
-					Guid:     user.GUID,
-					Username: user.Username,
-					IsAdmin:  false, // v3 API doesn't provide this info in role listing
-					Roles:    []string{roleName},
-				}
-			}
+// populateOrgUsersModel maps v3 users of the given org roles to plugin models
+func populateOrgUsersModel(usersByRole map[constant.RoleType][]resources.User, roles []constant.RoleType) []plugin_models.GetOrgUsers_Model {
+	users := collectUsersByRoles(usersByRole, roles)
+	result := make([]plugin_models.GetOrgUsers_Model, len(users))
+	for i, u := range users {
+		result[i] = plugin_models.GetOrgUsers_Model{
+			Guid:     u.user.GUID,
+			Username: u.user.Username,
+			IsAdmin:  false, // as in legacy, which listed users without querying UAA
+			Roles:    u.roles,
 		}
 	}
+	return result
+}
 
-	// Convert map to slice
-	result := make([]plugin_models.GetSpaceUsers_Model, 0, len(userMap))
-	for _, user := range userMap {
-		result = append(result, *user)
+// populateSpaceUsersModel maps v3 users of the legacy space roles to plugin models
+func populateSpaceUsersModel(usersByRole map[constant.RoleType][]resources.User) []plugin_models.GetSpaceUsers_Model {
+	users := collectUsersByRoles(usersByRole, spaceUsersRoles)
+	result := make([]plugin_models.GetSpaceUsers_Model, len(users))
+	for i, u := range users {
+		result[i] = plugin_models.GetSpaceUsers_Model{
+			Guid:     u.user.GUID,
+			Username: u.user.Username,
+			IsAdmin:  false, // as in legacy, which listed users without querying UAA
+			Roles:    u.roles,
+		}
 	}
 	return result
 }

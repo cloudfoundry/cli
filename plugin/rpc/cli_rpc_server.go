@@ -539,7 +539,15 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
-	*retVal = populateOrgUsersModel(usersByRole)
+	roles := orgUsersDefaultRoles
+	for _, arg := range args[1:] {
+		if arg == "-a" {
+			roles = orgUsersAllFlagRoles
+			break
+		}
+	}
+
+	*retVal = populateOrgUsersModel(usersByRole, roles)
 	return nil
 }
 
