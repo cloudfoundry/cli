@@ -386,6 +386,13 @@ func (c *cliConnection) GetService(serviceInstance string) (plugin_models.GetSer
 	return result, err
 }
 
+// CfClient returns a go-cfclient v3 client authenticated with the CLI's
+// current access token, refreshed if it was about to expire. The client does
+// not hold a refresh token, so it is only valid until that access token
+// expires (typically minutes). Long-running plugins should call CfClient()
+// again (or AccessToken()) before each batch of work rather than caching the
+// returned client. In install/uninstall callbacks the CLI cannot refresh the
+// token, so the stored token is used as-is.
 func (c *cliConnection) CfClient() (*client.Client, error) {
 	// Get the API endpoint
 	apiEndpoint, err := c.ApiEndpoint()

@@ -62,6 +62,13 @@ type CliConnection interface {
 	GetOrg(string) (plugin_models.GetOrg_Model, error)
 	// Deprecated: Use CfClient() for direct API calls to the Cloud Foundry API.
 	GetSpace(string) (plugin_models.GetSpace_Model, error)
+	// CfClient returns a go-cfclient v3 client authenticated with the CLI's
+	// current access token, refreshed if it was about to expire. The client does
+	// not hold a refresh token, so it is only valid until that access token
+	// expires (typically minutes). Long-running plugins should call CfClient()
+	// again (or AccessToken()) before each batch of work rather than caching the
+	// returned client. In install/uninstall callbacks the CLI cannot refresh the
+	// token, so the stored token is used as-is.
 	CfClient() (*client.Client, error)
 }
 
