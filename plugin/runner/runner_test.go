@@ -162,4 +162,15 @@ var _ = Describe("PluginRunner", func() {
 		// 3. Mock RPC server responses
 		// These are typically done in integration test suites with fixture binaries
 	})
+
+	DescribeTable("CommandArgs",
+		func(args []string, expected []string) {
+			Expect(runner.CommandArgs(args)).To(Equal(expected))
+		},
+		Entry("command first", []string{"my-cmd", "-f", "x"}, []string{"my-cmd", "-f", "x"}),
+		Entry("short global flag before the command", []string{"-v", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
+		Entry("long global flags before the command", []string{"--verbose", "-v", "my-cmd", "--opt", "val"}, []string{"my-cmd", "--opt", "val"}),
+		Entry("flags only", []string{"-v", "--help"}, nil),
+		Entry("no arguments", []string{}, nil),
+	)
 })

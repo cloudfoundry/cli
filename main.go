@@ -45,17 +45,18 @@ func main() {
 		var plugin configv3.Plugin
 		var commandIsPlugin bool
 
-		// Note: os.Args[1] can be safely indexed here because UnknownCommandError
-		// is only returned when ParseCommandFromArgs receives at least one argument.
-		// The command parser requires a command name to generate this error.
-		if len(os.Args) > 1 {
-			plugin, commandIsPlugin = config.FindPluginByCommand(os.Args[1])
+		// Global options may precede the command (e.g. cf -v my-plugin-cmd); the
+		// plugin gets the command and every argument after it.
+		commandArgs := runner.CommandArgs(os.Args[1:])
+		if len(commandArgs) > 0 {
+			plugin, commandIsPlugin = config.FindPluginByCommand(commandArgs[0])
+			unknownCommandError.CommandName = commandArgs[0]
 		}
 
 		switch {
 		case commandIsPlugin:
 			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, &p)
-			err = pluginRunner.Run(os.Args[1:])
+			err = pluginRunner.Run(commandArgs)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())
 				exitCode = 1

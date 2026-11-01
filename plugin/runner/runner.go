@@ -6,6 +6,7 @@ import (
 	netrpc "net/rpc"
 	"os"
 	"os/exec"
+	"strings"
 
 	"code.cloudfoundry.org/cli/v8/actor/sharedaction"
 	"code.cloudfoundry.org/cli/v8/actor/v7action"
@@ -122,6 +123,18 @@ func (r *pluginRunner) Run(args []string) error {
 		return r.handleError(err)
 	}
 
+	return nil
+}
+
+// CommandArgs returns the command line starting at the command: leading
+// arguments starting with "-" are global options (which take no values) and are
+// skipped. It returns nil when there is no command.
+func CommandArgs(args []string) []string {
+	for i, arg := range args {
+		if !strings.HasPrefix(arg, "-") {
+			return args[i:]
+		}
+	}
 	return nil
 }
 
