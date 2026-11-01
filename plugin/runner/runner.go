@@ -141,8 +141,9 @@ func CommandArgs(args []string) []string {
 // stopPlugin ensures the plugin process is terminated
 func stopPlugin(plugin *exec.Cmd) {
 	if plugin.Process != nil {
-		plugin.Process.Kill()
-		plugin.Wait()
+		// the plugin may already have exited; nothing to do if this fails
+		_ = plugin.Process.Kill()
+		_ = plugin.Wait()
 	}
 }
 
