@@ -98,6 +98,24 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 	return client.PollJobForState(jobURL, constant.JobComplete)
 }
 
+const initialJobPollingDelay = 250 * time.Millisecond
+
+func jobPollingDelay(elapsed, interval time.Duration) time.Duration {
+	if interval <= 0 {
+		return interval
+	}
+
+	next := (elapsed/interval + 1) * interval
+	for r := initialJobPollingDelay; r < interval; r = 2*r + initialJobPollingDelay {
+		if r > elapsed {
+			next = r
+			break
+		}
+	}
+
+	return next - elapsed
+}
+
 func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (Warnings, error) {
 	if jobURL == "" {
 		return nil, nil
@@ -137,7 +155,7 @@ func (client *Client) PollJobForState(jobURL JobURL, state constant.JobState) (W
 			return allWarnings, nil
 		}
 
-		time.Sleep(client.jobPollingInterval)
+		client.clock.Sleep(jobPollingDelay(client.clock.Now().Sub(startTime), client.jobPollingInterval))
 	}
 
 	return allWarnings, ccerror.JobTimeoutError{
@@ -191,7 +209,9 @@ func (client *Client) PollJobToEventStream(jobURL JobURL) chan PollJobEvent {
 			}
 
 			stream <- event
-			time.Sleep(client.jobPollingInterval)
+			if !end {
+				client.clock.Sleep(jobPollingDelay(client.clock.Now().Sub(startTime), client.jobPollingInterval))
+			}
 		}
 
 		close(stream)
