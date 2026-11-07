@@ -1,19 +1,19 @@
 module code.cloudfoundry.org/cli/v8
 
-go 1.26.9
+go 1.27.3
 
 require (
-	code.cloudfoundry.org/bytefmt v0.95.0
+	code.cloudfoundry.org/bytefmt v0.96.0
 	code.cloudfoundry.org/cli-plugin-repo v0.0.0-20200304195157-af98c4be9b85
 	code.cloudfoundry.org/cli/integration/assets/hydrabroker v0.0.0-20201002233634-81722a1144e4
-	code.cloudfoundry.org/clock v1.93.0
+	code.cloudfoundry.org/clock v1.94.0
 	code.cloudfoundry.org/diego-ssh v0.0.0-20230810200140-af9d79fe9c82
 	code.cloudfoundry.org/go-log-cache/v2 v2.0.7
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f
 	code.cloudfoundry.org/jsonry v1.1.4
-	code.cloudfoundry.org/lager/v3 v3.92.0
-	code.cloudfoundry.org/tlsconfig v0.69.0
+	code.cloudfoundry.org/lager/v3 v3.93.0
+	code.cloudfoundry.org/tlsconfig v0.70.0
 	code.cloudfoundry.org/ykk v0.0.0-20170424192843-e4df4ce2fd4d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
@@ -40,13 +40,13 @@ require (
 	github.com/tedsuo/rata v1.0.1-0.20170830210128-07d200713958
 	github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 	golang.org/x/crypto v0.58.0
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	golang.org/x/term v0.47.0
 	golang.org/x/text v0.43.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/apimachinery v0.37.1
-	k8s.io/client-go v0.37.1
+	k8s.io/apimachinery v0.37.2
+	k8s.io/client-go v0.37.2
 )
 
 require (
@@ -65,7 +65,7 @@ require (
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261016150608-1facf8f91b50 // indirect
+	github.com/google/pprof v0.0.0-20261026192309-dbd0ed30aa88 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/pty v1.1.8 // indirect
