@@ -14,6 +14,11 @@ import (
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
+	GetServiceAccount(guid string) (resources.ServiceAccount, ccv3.Warnings, error)
+	DeleteServiceAccount(guid string) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateServiceAccountEnabled(guid string, enabled bool) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateApplicationServiceAccount(appGUID string, relationship resources.Relationship) (ccv3.JobURL, ccv3.Warnings, error)
+	GetServiceAccounts(query ...ccv3.Query) ([]resources.ServiceAccount, ccv3.Warnings, error)
 	ApplyOrganizationQuota(quotaGUID string, orgGUID string) (resources.RelationshipList, ccv3.Warnings, error)
 	ApplySpaceQuota(quotaGUID string, spaceGUID string) (resources.RelationshipList, ccv3.Warnings, error)
 	CheckRoute(domainGUID string, hostname string, path string, port int) (bool, ccv3.Warnings, error)
@@ -40,6 +45,7 @@ type CloudControllerClient interface {
 	CreateServiceCredentialBinding(binding resources.ServiceCredentialBinding) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateServiceInstance(serviceInstance resources.ServiceInstance) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
+	CreateServiceAccount(account resources.ServiceAccount) (resources.ServiceAccount, ccv3.Warnings, error)
 	CreateSpace(space resources.Space) (resources.Space, ccv3.Warnings, error)
 	CreateSpaceQuota(spaceQuota resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)
 	CreateUser(userGUID string) (resources.User, ccv3.Warnings, error)
