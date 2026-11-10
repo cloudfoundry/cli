@@ -188,16 +188,39 @@ var _ = Describe("Job", func() {
 			warnings   Warnings
 			executeErr error
 
-			startTime time.Time
-
 			jobPollingTimeout time.Duration
 			fakeClock         *ccv3fakes.FakeClock
+			pollingSleeps     []time.Duration
+			fakeNow           time.Time
+			fakeGETDuration   time.Duration
 		)
+
+		useFakeClock := func() {
+			fakeNow = time.Time{}
+			fakeGETDuration = 0
+			pollingSleeps = nil
+			fakeClock.NowCalls(func() time.Time { return fakeNow })
+			fakeClock.SleepCalls(func(duration time.Duration) {
+				pollingSleeps = append(pollingSleeps, duration)
+				fakeNow = fakeNow.Add(duration)
+			})
+		}
+
+		setInterval := func(interval time.Duration) {
+			client, fakeClock = NewTestClient(Config{
+				JobPollingTimeout:  time.Minute,
+				JobPollingInterval: interval,
+			})
+			useFakeClock()
+		}
 
 		appendHandler := func(state string, warnings Warnings) {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/some-job-location"),
+					http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+						fakeNow = fakeNow.Add(fakeGETDuration)
+					}),
 					RespondWith(http.StatusAccepted, fmt.Sprintf(`
 						{
 							"guid": "job-guid",
@@ -255,6 +278,7 @@ var _ = Describe("Job", func() {
 		itFinishesWhenCompleteOrFailed := func() {
 			When("the job starts queued and then finishes successfully", func() {
 				BeforeEach(func() {
+					setInterval(3 * time.Second)
 					appendHandler("PROCESSING", Warnings{"warning-1"})
 					appendHandler("PROCESSING", Warnings{"warning-2"})
 					appendHandler("COMPLETE", Warnings{"warning-3", "warning-4"})
@@ -321,18 +345,13 @@ var _ = Describe("Job", func() {
 					BeforeEach(func() {
 						jobPollingTimeout = 100 * time.Millisecond
 						client, fakeClock = NewTestClient(Config{
-							JobPollingTimeout: jobPollingTimeout,
+							JobPollingTimeout:  jobPollingTimeout,
+							JobPollingInterval: 60 * time.Millisecond,
 						})
-
-						clockTime := time.Now()
-						fakeClock.NowReturnsOnCall(0, clockTime)
-						fakeClock.NowReturnsOnCall(1, clockTime)
-						fakeClock.NowReturnsOnCall(2, clockTime.Add(60*time.Millisecond))
-						fakeClock.NowReturnsOnCall(3, clockTime.Add(60*time.Millisecond*2))
+						useFakeClock()
 
 						appendHandler("PROCESSING", Warnings{"warning-1"})
 						appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
-						appendHandler("FINISHED", Warnings{"warning-4"})
 					})
 
 					It("raises a JobTimeoutError", func() {
@@ -343,42 +362,153 @@ var _ = Describe("Job", func() {
 						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
 					})
 
-					// Fuzzy test to ensure that the overall function time isn't [far]
-					// greater than the OverallPollingTimeout. Since this is partially
-					// dependent on the speed of the system, the expectation is that the
-					// function *should* never exceed three times the timeout.
-					It("does not run [too much] longer than the timeout", func() {
-						endTime := time.Now()
-						Expect(executeErr).To(HaveOccurred())
-
-						// If the jobPollingTimeout is less than the PollingInterval,
-						// then the margin may be too small, we should not allow the
-						// jobPollingTimeout to be set to less than the PollingInterval
-						Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
+					It("checks the timeout before another GET", func() {
+						Expect(server.ReceivedRequests()).To(HaveLen(2))
+						Expect(pollingSleeps).To(Equal([]time.Duration{60 * time.Millisecond, 60 * time.Millisecond}))
 					})
 				})
 			})
 		}
 
 		BeforeEach(func() {
-			client, _ = NewTestClient(Config{JobPollingTimeout: time.Minute})
+			setInterval(3 * time.Second)
 			jobLocation = JobURL(fmt.Sprintf("%s/some-job-location", server.URL()))
 		})
 
 		Describe("PollJob", func() {
 			JustBeforeEach(func() {
-				startTime = time.Now()
 				warnings, executeErr = client.PollJob(jobLocation)
 			})
 
 			itSkipsEmptyURLs()
 			itFinishesWhenCompleteOrFailed()
 			itRespectsTimeouts()
+
+			Context("polling delays", func() {
+				When("using the default interval", func() {
+					BeforeEach(func() {
+						setInterval(3 * time.Second)
+						for range 6 {
+							appendHandler("PROCESSING", nil)
+						}
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("starts at 250ms, doubles to the 3s interval, then stays there", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(server.ReceivedRequests()).To(HaveLen(7))
+						Expect(pollingSleeps).To(Equal([]time.Duration{
+							250 * time.Millisecond, 500 * time.Millisecond, time.Second,
+							1250 * time.Millisecond, 3 * time.Second, 3 * time.Second,
+						}))
+					})
+				})
+
+				When("each GET takes 100ms", func() {
+					BeforeEach(func() {
+						setInterval(3 * time.Second)
+						fakeGETDuration = 100 * time.Millisecond
+						for range 5 {
+							appendHandler("PROCESSING", nil)
+						}
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("sleeps 150ms, 400ms, 900ms, 1.15s, and 2.9s to keep checks on the grid", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(pollingSleeps).To(Equal([]time.Duration{
+							150 * time.Millisecond, 400 * time.Millisecond, 900 * time.Millisecond,
+							1150 * time.Millisecond, 2900 * time.Millisecond,
+						}))
+					})
+				})
+
+				When("the interval is 1s", func() {
+					BeforeEach(func() {
+						setInterval(time.Second)
+						for range 4 {
+							appendHandler("PROCESSING", nil)
+						}
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("caps the delay at the interval", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(pollingSleeps).To(Equal([]time.Duration{250 * time.Millisecond, 500 * time.Millisecond, 250 * time.Millisecond, time.Second}))
+					})
+				})
+
+				When("the interval is below the initial delay", func() {
+					BeforeEach(func() {
+						setInterval(100 * time.Millisecond)
+						appendHandler("PROCESSING", nil)
+						appendHandler("PROCESSING", nil)
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("uses the interval for every delay", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(pollingSleeps).To(Equal([]time.Duration{100 * time.Millisecond, 100 * time.Millisecond}))
+					})
+				})
+
+				When("the job completes on the first GET", func() {
+					BeforeEach(func() {
+						setInterval(3 * time.Second)
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("does not sleep", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(server.ReceivedRequests()).To(HaveLen(1))
+						Expect(pollingSleeps).To(BeEmpty())
+					})
+				})
+
+				When("PollJob is called a second time on the same client", func() {
+					BeforeEach(func() {
+						setInterval(3 * time.Second)
+						appendHandler("PROCESSING", nil)
+						appendHandler("COMPLETE", nil)
+					})
+
+					It("starts the second call at 250ms", func() {
+						appendHandler("PROCESSING", nil)
+						appendHandler("COMPLETE", nil)
+						Expect(executeErr).NotTo(HaveOccurred())
+						_, secondErr := client.PollJob(jobLocation)
+						Expect(secondErr).NotTo(HaveOccurred())
+						Expect(pollingSleeps).To(Equal([]time.Duration{
+							250 * time.Millisecond, 250 * time.Millisecond,
+						}))
+					})
+				})
+			})
 		})
+
+		DescribeTable("PollJob accounts for elapsed GET time and the next polling grid point",
+			func(elapsed, interval, expected time.Duration) {
+				setInterval(interval)
+				fakeGETDuration = elapsed
+				appendHandler("PROCESSING", nil)
+				appendHandler("COMPLETE", nil)
+
+				_, executeErr = client.PollJob(jobLocation)
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(pollingSleeps).To(Equal([]time.Duration{expected}))
+			},
+
+			Entry("when elapsed time is 1s and interval is 3s", time.Second, 3*time.Second, 750*time.Millisecond),
+			Entry("when elapsed time is 8s and interval is 3s", 8*time.Second, 3*time.Second, time.Second),
+			Entry("when elapsed time is 1.75s and interval is 10s", 1750*time.Millisecond, 10*time.Second, 2*time.Second),
+			Entry("when elapsed time is exactly on the 3s grid point", 3*time.Second, 3*time.Second, 3*time.Second),
+			Entry("when elapsed time and interval are zero", time.Duration(0), time.Duration(0), time.Duration(0)),
+			Entry("when the interval is negative", time.Duration(0), -time.Second, -time.Second),
+			Entry("when the interval is below the initial delay", time.Duration(0), 100*time.Millisecond, 100*time.Millisecond),
+		)
 
 		Describe("PollJobForState", func() {
 			JustBeforeEach(func() {
-				startTime = time.Now()
 				warnings, executeErr = client.PollJobForState(jobLocation, constant.JobPolling)
 			})
 
@@ -404,7 +534,6 @@ var _ = Describe("Job", func() {
 			var stream chan PollJobEvent
 
 			JustBeforeEach(func() {
-				startTime = time.Now()
 				stream = client.PollJobToEventStream(jobLocation)
 			})
 
@@ -421,12 +550,17 @@ var _ = Describe("Job", func() {
 
 			When("the job starts queued and then finishes successfully", func() {
 				BeforeEach(func() {
+					setInterval(3 * time.Second)
 					appendHandler("PROCESSING", Warnings{"warning-1"})
 					appendHandler("PROCESSING", Warnings{"warning-2"})
+					appendHandler("PROCESSING", nil)
+					appendHandler("PROCESSING", nil)
+					appendHandler("PROCESSING", nil)
+					appendHandler("PROCESSING", nil)
 					appendHandler("COMPLETE", Warnings{"warning-3", "warning-4"})
 				})
 
-				It("should poll until completion", func() {
+				It("closes the stream after the terminal event without sleeping", func() {
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobProcessing,
 						Err:      nil,
@@ -439,6 +573,9 @@ var _ = Describe("Job", func() {
 						Warnings: Warnings{"warning-2"},
 						JobGUID:  "job-guid",
 					})))
+					for range 4 {
+						Eventually(stream).Should(Receive())
+					}
 					Eventually(stream).Should(Receive(Equal(PollJobEvent{
 						State:    constant.JobComplete,
 						Err:      nil,
@@ -446,6 +583,33 @@ var _ = Describe("Job", func() {
 						JobGUID:  "job-guid",
 					})))
 					Eventually(stream).Should(BeClosed())
+					Expect(pollingSleeps).To(Equal([]time.Duration{
+						250 * time.Millisecond, 500 * time.Millisecond, time.Second,
+						1250 * time.Millisecond, 3 * time.Second, 3 * time.Second,
+					}))
+				})
+			})
+
+			When("a GET takes longer than the next scheduled polling point", func() {
+				BeforeEach(func() {
+					setInterval(3 * time.Second)
+					fakeGETDuration = time.Second
+					appendHandler("PROCESSING", nil)
+					appendHandler("COMPLETE", nil)
+				})
+
+				It("sleeps until the next polling grid point", func() {
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:   constant.JobProcessing,
+						JobGUID: "job-guid",
+					})))
+					Eventually(stream).Should(Receive(Equal(PollJobEvent{
+						State:   constant.JobComplete,
+						JobGUID: "job-guid",
+					})))
+					Eventually(stream).Should(BeClosed())
+					Expect(server.ReceivedRequests()).To(HaveLen(2))
+					Expect(pollingSleeps).To(Equal([]time.Duration{750 * time.Millisecond}))
 				})
 			})
 
@@ -484,14 +648,11 @@ var _ = Describe("Job", func() {
 					BeforeEach(func() {
 						jobPollingTimeout = 100 * time.Millisecond
 						client, fakeClock = NewTestClient(Config{
-							JobPollingTimeout: jobPollingTimeout,
+							JobPollingTimeout:  jobPollingTimeout,
+							JobPollingInterval: 60 * time.Millisecond,
 						})
 
-						clockTime := time.Now()
-						fakeClock.NowReturnsOnCall(0, clockTime)
-						fakeClock.NowReturnsOnCall(1, clockTime)
-						fakeClock.NowReturnsOnCall(2, clockTime.Add(60*time.Millisecond))
-						fakeClock.NowReturnsOnCall(3, clockTime.Add(60*time.Millisecond*2))
+						useFakeClock()
 
 						appendHandler("PROCESSING", Warnings{"warning-1"})
 						appendHandler("PROCESSING", Warnings{"warning-2", "warning-3"})
@@ -511,18 +672,13 @@ var _ = Describe("Job", func() {
 						Eventually(stream).Should(BeClosed())
 					})
 
-					// Fuzzy test to ensure that the overall function time isn't [far]
-					// greater than the OverallPollingTimeout. Since this is partially
-					// dependent on the speed of the system, the expectation is that the
-					// function *should* never exceed three times the timeout.
-					It("does not run [too much] longer than the timeout", func() {
+					It("checks timeout after GET and sleeps only between events", func() {
+						for range 3 {
+							Eventually(stream).Should(Receive())
+						}
 						Eventually(stream).Should(BeClosed())
-						endTime := time.Now()
-
-						// If the jobPollingTimeout is less than the PollingInterval,
-						// then the margin may be too small, we should not allow the
-						// jobPollingTimeout to be set to less than the PollingInterval
-						Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
+						Expect(server.ReceivedRequests()).To(HaveLen(3))
+						Expect(pollingSleeps).To(Equal([]time.Duration{60 * time.Millisecond, 60 * time.Millisecond}))
 					})
 				})
 			})
