@@ -175,14 +175,49 @@ jobs:
         end
         EOF
 
+          cat <<EOF > cf-cli.rb
+        class CfCli < Formula
+          desc     "Cloud Foundry CLI"
+          homepage "https://code.cloudfoundry.org/cli"
+          version  "${VERSION_BUILD}"
+
+          if OS.mac?
+            if Hardware::CPU.arm?
+              url "${CLAW_URL}/homebrew?arch=macosarm&version=${VERSION_BUILD}"
+              sha256 "${CLI_MACOSARM_SHA256}"
+            elsif
+              url "${CLAW_URL}/homebrew?arch=macosx64&version=${VERSION_BUILD}"
+              sha256 "${CLI_OSX_SHA256}"
+            end
+          elsif OS.linux?
+            url "${CLAW_URL}/stable?release=linux64-binary&version=${VERSION_BUILD}&source=homebrew"
+            sha256 "${CLI_LINUX_64_SHA256}"
+          end
+
+          def install
+            bin.install "cf${VERSION_MAJOR}"
+            bin.install_symlink "cf${VERSION_MAJOR}" => "cf"
+            (bash_completion/"cf${VERSION_MAJOR}-cli").write <<-completion
+        $(cat ../cli-ci/ci/installers/completion/cf${VERSION_MAJOR})
+            completion
+            doc.install "LICENSE"
+            doc.install "NOTICE"
+          end
+
+          test do
+            system "#{bin}/cf${VERSION_MAJOR}"
+          end
+        end
+        EOF
+
         popd
 
     - name: Commit new homebrew formula
       run: |
         pushd homebrew-tap
-          git add cf-cli@${VERSION_MAJOR}.rb
+          git add cf-cli@${VERSION_MAJOR}.rb cf-cli.rb
 
-          if ! [ -z "$(git status --porcelain)"]; then
+          if ! [ -z "$(git status --porcelain)" ]; then
             git config user.name cf-cli-eng
             git config user.email cf-cli-eng@pivotal.io
             git commit -m "Release CF CLI ${VERSION_BUILD}"
