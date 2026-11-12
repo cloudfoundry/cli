@@ -44,4 +44,33 @@ var _ = Describe("PluginRepository", func() {
 			Expect(config.PluginRepositories()).To(ContainElement(PluginRepository{Name: "some-repo", URL: "some-URL"}))
 		})
 	})
+
+	Describe("RemovePluginRepository", func() {
+		var config Config
+
+		BeforeEach(func() {
+			config = Config{
+				ConfigFile: JSONConfig{
+					PluginRepositories: []PluginRepository{
+						{Name: "repo-a", URL: "a.com"},
+						{Name: "repo-b", URL: "b.com"},
+						{Name: "repo-c", URL: "c.com"},
+					},
+				},
+			}
+		})
+
+		It("removes the repository with the given name", func() {
+			config.RemovePluginRepository("repo-b")
+			Expect(config.PluginRepositories()).To(Equal([]PluginRepository{
+				{Name: "repo-a", URL: "a.com"},
+				{Name: "repo-c", URL: "c.com"},
+			}))
+		})
+
+		It("does nothing when no repository has the given name", func() {
+			config.RemovePluginRepository("missing")
+			Expect(config.PluginRepositories()).To(HaveLen(3))
+		})
+	})
 })

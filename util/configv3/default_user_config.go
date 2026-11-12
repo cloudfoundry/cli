@@ -32,12 +32,13 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 		return User{}, err
 	}
 
-	var name, GUID, origin string
+	var name, GUID, origin, email string
 	var isClient bool
 	if value, ok := claims["user_name"].(string); ok {
 		name = value
 		GUID, _ = claims["user_id"].(string)
 		origin, _ = claims["origin"].(string)
+		email, _ = claims["email"].(string)
 		isClient = false
 	} else {
 		name, _ = claims["client_id"].(string)
@@ -49,6 +50,7 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 		Name:     name,
 		GUID:     GUID,
 		Origin:   origin,
+		Email:    email,
 		IsClient: isClient,
 	}, nil
 }

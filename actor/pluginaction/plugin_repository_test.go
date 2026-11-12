@@ -229,4 +229,71 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 	})
+
+	Describe("RemovePluginRepository", func() {
+		BeforeEach(func() {
+			fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+				{Name: "repo-a", URL: "https://a.com"},
+				{Name: "repo-b", URL: "https://b.com"},
+			})
+		})
+
+		When("the repository is registered", func() {
+			It("removes it, matching the trimmed name case-insensitively", func() {
+				err := actor.RemovePluginRepository(" Repo-B ")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeConfig.RemovePluginRepositoryCallCount()).To(Equal(1))
+				Expect(fakeConfig.RemovePluginRepositoryArgsForCall(0)).To(Equal("repo-b"))
+			})
+		})
+
+		When("the repository is not registered", func() {
+			It("returns a RepositoryNotRegisteredError and removes nothing", func() {
+				err := actor.RemovePluginRepository("unknown")
+				Expect(err).To(MatchError(actionerror.RepositoryNotRegisteredError{Name: "unknown"}))
+				Expect(fakeConfig.RemovePluginRepositoryCallCount()).To(Equal(0))
+			})
+		})
+	})
+
+	Describe("GetPluginsFromRepositories", func() {
+		var (
+			repositoryPlugins []RepositoryPlugins
+			errs              []error
+		)
+
+		BeforeEach(func() {
+			fakePluginClient.GetPluginRepositoryReturnsOnCall(0, plugin.PluginRepository{
+				Plugins: []plugin.Plugin{{Name: "plugin-1", Version: "1.0.0", Description: "first"}},
+			}, nil)
+			fakePluginClient.GetPluginRepositoryReturnsOnCall(1, plugin.PluginRepository{}, errors.New("404 not found"))
+		})
+
+		JustBeforeEach(func() {
+			repositoryPlugins, errs = actor.GetPluginsFromRepositories([]configv3.PluginRepository{
+				{Name: "community", URL: "http://plugins.cloudfoundry.org"},
+				{Name: "broken", URL: "https://broken.example.com"},
+			})
+		})
+
+		It("returns the plugins of each reachable repository, in order", func() {
+			Expect(repositoryPlugins).To(Equal([]RepositoryPlugins{
+				{RepositoryName: "community", Plugins: []plugin.Plugin{{Name: "plugin-1", Version: "1.0.0", Description: "first"}}},
+			}))
+		})
+
+		It("collects an error per unreachable repository and keeps going", func() {
+			Expect(errs).To(ConsistOf(actionerror.FetchingPluginInfoFromRepositoryError{
+				RepositoryName: "broken",
+				Err:            errors.New("404 not found"),
+			}))
+			Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(2))
+		})
+
+		It("uses https for http://plugins.cloudfoundry.org", func() {
+			Expect(fakePluginClient.GetPluginRepositoryArgsForCall(0)).To(Equal("https://plugins.cloudfoundry.org"))
+			Expect(fakePluginClient.GetPluginRepositoryArgsForCall(1)).To(Equal("https://broken.example.com"))
+		})
+	})
 })

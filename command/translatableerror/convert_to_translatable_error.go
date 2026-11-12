@@ -147,8 +147,6 @@ func ConvertToTranslatableError(err error) error {
 		return RunTaskError{Message: "Task workers are unavailable."}
 	case actionerror.TCPRouteOptionsNotProvidedError:
 		return TCPRouteOptionsNotProvidedError{}
-	case actionerror.TriggerLegacyPushError:
-		return TriggerLegacyPushError{DomainHostRelated: e.DomainHostRelated}
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
 	case actionerror.CommandLineOptionsAndManifestConflictError:
@@ -202,10 +200,6 @@ func ConvertToTranslatableError(err error) error {
 	// Manifest Errors
 	case manifest.ManifestCreationError:
 		return FileCreationError(e)
-	case manifest.InheritanceFieldError:
-		return TriggerLegacyPushError{InheritanceRelated: true}
-	case manifest.GlobalFieldsError:
-		return TriggerLegacyPushError{GlobalRelated: e.Fields}
 	case manifest.InterpolationError:
 		return InterpolationError(e)
 
