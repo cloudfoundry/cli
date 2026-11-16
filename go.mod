@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/cli/v9
 
-go 1.27.3
+go 1.27.4
 
 require (
 	code.cloudfoundry.org/bytefmt v0.97.0
