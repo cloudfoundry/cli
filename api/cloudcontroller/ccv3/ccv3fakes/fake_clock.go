@@ -11,23 +11,30 @@ import (
 type FakeClock struct {
 	NowStub        func() time.Time
 	nowMutex       sync.RWMutex
-	nowArgsForCall []struct {
-	}
-	nowReturns struct {
+	nowArgsForCall []struct{}
+	nowReturns     struct {
 		result1 time.Time
 	}
 	nowReturnsOnCall map[int]struct {
 		result1 time.Time
 	}
+	SleepStub        func(time.Duration)
+	sleepMutex       sync.RWMutex
+	sleepArgsForCall []FakeClockSleepArgs
 	invocations      map[string][][]interface{}
+	callOrder        []string
 	invocationsMutex sync.RWMutex
+}
+
+// FakeClockSleepArgs holds the arguments of one call to Sleep.
+type FakeClockSleepArgs struct {
+	Arg1 time.Duration
 }
 
 func (fake *FakeClock) Now() time.Time {
 	fake.nowMutex.Lock()
 	ret, specificReturn := fake.nowReturnsOnCall[len(fake.nowArgsForCall)]
-	fake.nowArgsForCall = append(fake.nowArgsForCall, struct {
-	}{})
+	fake.nowArgsForCall = append(fake.nowArgsForCall, struct{}{})
 	stub := fake.NowStub
 	fakeReturns := fake.nowReturns
 	fake.recordInvocation("Now", []interface{}{})
@@ -76,6 +83,44 @@ func (fake *FakeClock) NowReturnsOnCall(i int, result1 time.Time) {
 	}{result1}
 }
 
+func (fake *FakeClock) Sleep(arg1 time.Duration) {
+	fake.sleepMutex.Lock()
+	fake.sleepArgsForCall = append(fake.sleepArgsForCall, FakeClockSleepArgs{arg1})
+	stub := fake.SleepStub
+	fake.recordInvocation("Sleep", []interface{}{arg1})
+	fake.sleepMutex.Unlock()
+	if stub != nil {
+		stub(arg1)
+	}
+}
+
+func (fake *FakeClock) SleepCallCount() int {
+	fake.sleepMutex.RLock()
+	defer fake.sleepMutex.RUnlock()
+	return len(fake.sleepArgsForCall)
+}
+
+func (fake *FakeClock) SleepCalls(stub func(time.Duration)) {
+	fake.sleepMutex.Lock()
+	defer fake.sleepMutex.Unlock()
+	fake.SleepStub = stub
+}
+
+func (fake *FakeClock) SleepArgsForCall(i int) time.Duration {
+	fake.sleepMutex.RLock()
+	defer fake.sleepMutex.RUnlock()
+	argsForCall := fake.sleepArgsForCall[i]
+	return argsForCall.Arg1
+}
+
+func (fake *FakeClock) SleepArgs() []FakeClockSleepArgs {
+	fake.sleepMutex.RLock()
+	defer fake.sleepMutex.RUnlock()
+	args := make([]FakeClockSleepArgs, len(fake.sleepArgsForCall))
+	copy(args, fake.sleepArgsForCall)
+	return args
+}
+
 func (fake *FakeClock) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -86,9 +131,18 @@ func (fake *FakeClock) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
+func (fake *FakeClock) CallOrder() []string {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	order := make([]string, len(fake.callOrder))
+	copy(order, fake.callOrder)
+	return order
+}
+
 func (fake *FakeClock) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
+	fake.callOrder = append(fake.callOrder, key)
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}
