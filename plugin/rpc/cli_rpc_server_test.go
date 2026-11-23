@@ -27,6 +27,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/plugin/rpc/rpcfakes"
 	"code.cloudfoundry.org/cli/v8/resources"
 	"code.cloudfoundry.org/cli/v8/types"
+	"code.cloudfoundry.org/cli/v8/util/command_parser"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/ui"
 	"code.cloudfoundry.org/clock/fakeclock"
@@ -1181,6 +1182,33 @@ var _ = Describe("Server", func() {
 	Describe(".CallCoreCommand", func() {
 		var commandParser *rpcfakes.FakeCommandParser
 		var v3config *configv3.Config
+
+		It("does not leak flags between RPC calls using the real command parser", func() {
+			v3config = testconfig.NewConfigWithDefaults()
+			parser, err := command_parser.NewCommandParser(v3config)
+			Expect(err).ToNot(HaveOccurred())
+			service, err := NewRpcService(v3config, rpc.NewServer(), nil, &parser, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(service.Start()).To(Succeed())
+			DeferCleanup(service.Stop)
+			connection, err := rpc.Dial("tcp", "127.0.0.1:"+service.Port())
+			Expect(err).ToNot(HaveOccurred())
+			DeferCleanup(connection.Close)
+
+			var success bool
+			Expect(connection.Call("CliRpcCmd.DisableTerminalOutput", true, &success)).To(Succeed())
+			Expect(connection.Call("CliRpcCmd.CallCoreCommand", []string{"plugins", "--checksum"}, &success)).To(Succeed())
+			var firstOutput []string
+			Expect(connection.Call("CliRpcCmd.GetOutputAndReset", false, &firstOutput)).To(Succeed())
+			Expect(firstOutput).To(ContainElement(ContainSubstring("sha1")))
+
+			Expect(connection.Call("CliRpcCmd.CallCoreCommand", []string{"plugins"}, &success)).To(Succeed())
+			Expect(success).To(BeTrue())
+			var secondOutput []string
+			Expect(connection.Call("CliRpcCmd.GetOutputAndReset", false, &secondOutput)).To(Succeed())
+			Expect(secondOutput).To(ContainElement(ContainSubstring("command name")))
+			Expect(secondOutput).ToNot(ContainElement(ContainSubstring("sha1")))
+		})
 
 		Context("success", func() {
 			BeforeEach(func() {

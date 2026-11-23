@@ -43,13 +43,13 @@ func NewCommandParser(config *configv3.Config) (CommandParser, error) {
 
 func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) (int, error) {
 	p.UI = ui
-	return p.parse(args, &common.Commands)
+	return p.parse(args, &common.CommandList{})
 }
 
-func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) error {
+func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string, verbose bool) error {
 	cfConfig := p.Config
 	cfConfig.Flags = configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
+		Verbose: verbose,
 	}
 	defer p.UI.FlushDeferred()
 
@@ -120,7 +120,7 @@ func (p *CommandParser) handleError(passedErr error) error {
 	return ErrFailed
 }
 
-func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flagsParser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) (int, error) {
+func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flagsParser *flags.Parser, extraArgs []string, originalArgs []string, commandList *common.CommandList) (int, error) {
 	switch flagErr.Type {
 	case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument, flags.ErrInvalidChoice:
 		_, commandExists := reflect.TypeOf(common.Commands).FieldByNameFunc(
@@ -188,7 +188,7 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 		}
 
 	case flags.ErrCommandRequired:
-		if common.Commands.VerboseOrVersion {
+		if commandList.VerboseOrVersion {
 			return p.parse([]string{"version"}, commandList)
 		} else {
 			return p.parse([]string{"help"}, commandList)
@@ -201,9 +201,11 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 	return 0, nil
 }
 
-func (p *CommandParser) parse(args []string, commandList interface{}) (int, error) {
+func (p *CommandParser) parse(args []string, commandList *common.CommandList) (int, error) {
 	flagsParser := flags.NewParser(commandList, flags.HelpFlag)
-	flagsParser.CommandHandler = p.executionWrapper
+	flagsParser.CommandHandler = func(cmd flags.Commander, args []string) error {
+		return p.executionWrapper(cmd, args, commandList.VerboseOrVersion)
+	}
 	extraArgs, err := flagsParser.ParseArgs(args)
 	if err == nil {
 		return 0, nil

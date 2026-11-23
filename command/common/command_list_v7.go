@@ -7,9 +7,12 @@ import (
 	v7 "code.cloudfoundry.org/cli/v8/command/v7"
 )
 
-var Commands commandList
+// Commands provides command metadata for help and command lookup. Parsing uses
+// a fresh CommandList so flag values are not shared between invocations.
+var Commands CommandList
 
-type commandList struct {
+// CommandList contains the commands and global options for a single invocation.
+type CommandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
@@ -210,7 +213,7 @@ type commandList struct {
 }
 
 // HasCommand returns true if the command name is in the command list.
-func (c commandList) HasCommand(name string) bool {
+func (c CommandList) HasCommand(name string) bool {
 	if name == "" {
 		return false
 	}
@@ -227,7 +230,7 @@ func (c commandList) HasCommand(name string) bool {
 }
 
 // HasAlias returns true if the command alias is in the command list.
-func (c commandList) HasAlias(alias string) bool {
+func (c CommandList) HasAlias(alias string) bool {
 	if alias == "" {
 		return false
 	}
