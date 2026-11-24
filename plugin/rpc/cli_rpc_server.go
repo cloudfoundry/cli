@@ -449,11 +449,10 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	// Get detailed app summary; withObfuscatedValues fetches each process
 	// individually, so the start command is not redacted
 	summary, warnings, err := actor.GetDetailedAppSummary(appName, spaceGUID, true)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Get service bindings for the app
 	serviceBindings, ccWarnings, err := actor.CloudControllerClient.GetServiceCredentialBindings(
@@ -542,11 +541,10 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 
 	// Get app summaries for the space (omitStats=false to get instances)
 	summaries, warnings, err := actor.GetAppSummariesForSpace(spaceGUID, "", false)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateAppsModel(summaries)
@@ -564,11 +562,10 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 	}
 
 	orgs, warnings, err := actor.GetOrganizations("")
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateOrgsModel(orgs)
@@ -590,11 +587,10 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 	}
 
 	spaces, warnings, err := actor.GetOrganizationSpaces(orgGUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateSpacesModel(spaces)
@@ -616,11 +612,10 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 	}
 
 	services, warnings, err := actor.GetServiceInstancesForSpace(spaceGUID, false)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateServicesModel(services)
@@ -643,20 +638,17 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 
 	// Get org GUID from name
 	org, warnings, err := actor.GetOrganizationByName(orgName)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	// Handle warnings from org lookup
-	cmd.displayWarnings(warnings)
 
 	// Get users by role type
 	usersByRole, warnings, err := actor.GetOrgUsersByRoleType(org.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	roles := orgUsersDefaultRoles
@@ -688,29 +680,24 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 
 	// Get org GUID from name
 	org, warnings, err := actor.GetOrganizationByName(orgName)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	// Handle warnings from org lookup
-	cmd.displayWarnings(warnings)
 
 	// Get space GUID from name
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	// Handle warnings from space lookup
-	cmd.displayWarnings(warnings)
 
 	// Get users by role type
 	usersByRole, warnings, err := actor.GetSpaceUsersByRoleType(space.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateSpaceUsersModel(usersByRole)
@@ -728,43 +715,42 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 
 	// 1. Get the organization by name
 	org, warnings, err := actor.GetOrganizationByName(orgName)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	cmd.displayWarnings(warnings)
 
 	// 2. Get organization quota
 	var quota resources.OrganizationQuota
 	if org.QuotaGUID != "" {
 		var ccv3Warnings ccv3.Warnings
 		quota, ccv3Warnings, err = actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+		cmd.displayWarnings(ccv3Warnings)
 		if err != nil {
 			return err
 		}
-		cmd.displayWarnings(ccv3Warnings)
 	}
 
 	// 3. Get organization spaces
 	spaces, warnings, err := actor.GetOrganizationSpaces(org.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 4. Get organization domains
 	domains, warnings, err := actor.GetOrganizationDomains(org.GUID, "")
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 5. Get space quotas for the organization
 	spaceQuotas, warnings, err := actor.GetSpaceQuotasByOrgGUID(org.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// Populate plugin model using mapping function
 	*retVal = populateOrgModel(org, quota, spaces, domains, spaceQuotas)
@@ -788,65 +774,65 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 
 	// 1. Get the space by name and organization
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 2. Get organization info
 	org, warnings, err := actor.GetOrganizationByGUID(orgGUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 3. Get applications in the space
 	apps, warnings, err := actor.GetApplicationsBySpace(space.GUID)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 4. Get service instances in the space
 	serviceInstances, warnings, err := actor.GetServiceInstancesForSpace(space.GUID, false)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 5. Get domains for the organization (spaces inherit org domains)
 	domains, warnings, err := actor.GetOrganizationDomains(orgGUID, "")
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(warnings)
 
 	// 6. Get space quota (if applied)
 	var spaceQuota resources.SpaceQuota
 	if space.Relationships[constant.RelationshipTypeQuota].GUID != "" {
 		var ccv3Warnings ccv3.Warnings
 		spaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		cmd.displayWarnings(ccv3Warnings)
 		if err != nil {
 			return err
 		}
-		cmd.displayWarnings(ccv3Warnings)
 	}
 
 	// 7. Get security groups (both running and staging)
 	var allSecurityGroups []resources.SecurityGroup
 
 	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	cmd.displayWarnings(ccv3Warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(ccv3Warnings)
 	allSecurityGroups = append(allSecurityGroups, runningSecurityGroups...)
 
 	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	cmd.displayWarnings(ccv3Warnings)
 	if err != nil {
 		return err
 	}
-	cmd.displayWarnings(ccv3Warnings)
 
 	// Deduplicate security groups (some may be both running and staging)
 	seenGroups := make(map[string]bool)
@@ -890,12 +876,10 @@ func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_mode
 		spaceGUID,
 		queries...,
 	)
+	cmd.displayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-
-	// Log warnings if any
-	cmd.displayWarnings(warnings)
 
 	// Populate the plugin model
 	populateServiceModel(retVal, serviceInstance, includedResources)

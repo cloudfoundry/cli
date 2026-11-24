@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -432,6 +433,7 @@ var _ = Describe("Server", func() {
 			Expect(client.Call("CliRpcCmd.GetOrgs", "", &result)).To(Succeed())
 
 			Expect(uiErr).To(Say("cc-warning"))
+			Expect(strings.Count(string(uiErr.Contents()), "cc-warning")).To(Equal(1))
 			Expect(uiOut.Contents()).To(BeEmpty())
 		})
 
@@ -1768,6 +1770,116 @@ var _ = Describe("Server", func() {
 				Skip("CommandParser doesn't panic in the same way as legacy runner")
 			})
 		})
+	})
+
+	Describe("warnings on request errors", func() {
+		var (
+			cc           *v7actionfakes.FakeCloudControllerClient
+			out, errOut  *Buffer
+			requestError error
+			warnings     ccv3.Warnings
+		)
+
+		BeforeEach(func() {
+			config := testconfig.NewConfigWithDefaults()
+			config.ConfigFile.APIVersion = "3.200.0"
+			config.ConfigFile.TargetedOrganization.GUID = "org-guid"
+			config.ConfigFile.TargetedSpace.GUID = "space-guid"
+			cc = new(v7actionfakes.FakeCloudControllerClient)
+			cc.GetOrganizationsReturns([]resources.Organization{{GUID: "org-guid", Name: "org", QuotaGUID: "org-quota"}}, nil, nil)
+			cc.GetOrganizationReturns(resources.Organization{GUID: "org-guid", Name: "org"}, nil, nil)
+			cc.GetSpacesReturns([]resources.Space{{GUID: "space-guid", Name: "space", Relationships: map[constant.RelationshipType]resources.Relationship{
+				constant.RelationshipTypeQuota: {GUID: "space-quota"},
+			}}}, ccv3.IncludedResources{}, nil, nil)
+			cc.GetApplicationsReturns([]resources.Application{{GUID: "app-guid", Name: "app", State: constant.ApplicationStopped}}, nil, nil)
+			cc.GetApplicationDropletCurrentReturns(resources.Droplet{GUID: "droplet-guid", Stack: "stack"}, nil, nil)
+			cc.GetServiceCredentialBindingsReturns([]resources.ServiceCredentialBinding{{ServiceInstanceGUID: "service-guid"}}, nil, nil)
+			out, errOut = NewBuffer(), NewBuffer()
+			actor := v7action.NewActor(cc, config, nil, nil, nil, fakeclock.NewFakeClock(time.Now()))
+			var err error
+			rpcService, err = NewRpcService(config, rpc.NewServer(), actor, nil, ui.NewTestUI(nil, out, errOut))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(rpcService.Start()).To(Succeed())
+			DeferCleanup(rpcService.Stop)
+			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
+			Expect(err).ToNot(HaveOccurred())
+			requestError = errors.New("request-error")
+			warnings = ccv3.Warnings{"warning-from-failing-request"}
+		})
+
+		DescribeTable("displays each warning once on stderr and preserves the request error",
+			func(method, stage string, args interface{}, result interface{}) {
+				switch stage {
+				case "applications":
+					cc.GetApplicationsReturns(nil, warnings, requestError)
+				case "bindings":
+					cc.GetServiceCredentialBindingsReturns(nil, warnings, requestError)
+				case "instances":
+					cc.GetServiceInstancesReturns(nil, ccv3.IncludedResources{}, warnings, requestError)
+				case "stacks":
+					cc.GetStacksReturns(nil, warnings, requestError)
+				case "environment":
+					cc.GetApplicationEnvironmentReturns(ccv3.Environment{}, warnings, requestError)
+				case "organizations":
+					cc.GetOrganizationsReturns(nil, warnings, requestError)
+				case "spaces":
+					cc.GetSpacesReturns(nil, ccv3.IncludedResources{}, warnings, requestError)
+				case "roles":
+					cc.GetRolesReturns(nil, ccv3.IncludedResources{}, warnings, requestError)
+				case "organization quota":
+					cc.GetOrganizationQuotaReturns(resources.OrganizationQuota{}, warnings, requestError)
+				case "domains":
+					cc.GetOrganizationDomainsReturns(nil, warnings, requestError)
+				case "space quotas":
+					cc.GetSpaceQuotasReturns(nil, warnings, requestError)
+				case "organization":
+					cc.GetOrganizationReturns(resources.Organization{}, warnings, requestError)
+				case "space quota":
+					cc.GetSpaceQuotaReturns(resources.SpaceQuota{}, warnings, requestError)
+				case "running groups":
+					cc.GetRunningSecurityGroupsReturns(nil, warnings, requestError)
+				case "staging groups":
+					cc.GetStagingSecurityGroupsReturns(nil, warnings, requestError)
+				case "service":
+					cc.GetServiceInstanceByNameAndSpaceReturns(resources.ServiceInstance{}, ccv3.IncludedResources{}, warnings, requestError)
+				default:
+					Fail("unknown request stage: " + stage)
+				}
+
+				Expect(client.Call("CliRpcCmd."+method, args, result)).To(MatchError(requestError.Error()))
+				Expect(errOut.Contents()).To(ContainSubstring("warning-from-failing-request"))
+				Expect(strings.Count(string(errOut.Contents()), "warning-from-failing-request")).To(Equal(1))
+				Expect(out.Contents()).To(BeEmpty())
+			},
+			Entry("GetApp summary", "GetApp", "applications", "app", new(plugin_models.GetAppModel)),
+			Entry("GetApp bindings", "GetApp", "bindings", "app", new(plugin_models.GetAppModel)),
+			Entry("GetApp instances", "GetApp", "instances", "app", new(plugin_models.GetAppModel)),
+			Entry("GetApp stacks", "GetApp", "stacks", "app", new(plugin_models.GetAppModel)),
+			Entry("GetApp environment", "GetApp", "environment", "app", new(plugin_models.GetAppModel)),
+			Entry("GetApps", "GetApps", "applications", "", new([]plugin_models.GetAppsModel)),
+			Entry("GetOrgs", "GetOrgs", "organizations", "", new([]plugin_models.GetOrgs_Model)),
+			Entry("GetSpaces", "GetSpaces", "spaces", "", new([]plugin_models.GetSpaces_Model)),
+			Entry("GetServices", "GetServices", "instances", "", new([]plugin_models.GetServices_Model)),
+			Entry("GetOrgUsers org lookup", "GetOrgUsers", "organizations", []string{"org"}, new([]plugin_models.GetOrgUsers_Model)),
+			Entry("GetOrgUsers roles", "GetOrgUsers", "roles", []string{"org"}, new([]plugin_models.GetOrgUsers_Model)),
+			Entry("GetSpaceUsers org lookup", "GetSpaceUsers", "organizations", []string{"org", "space"}, new([]plugin_models.GetSpaceUsers_Model)),
+			Entry("GetSpaceUsers space lookup", "GetSpaceUsers", "spaces", []string{"org", "space"}, new([]plugin_models.GetSpaceUsers_Model)),
+			Entry("GetSpaceUsers roles", "GetSpaceUsers", "roles", []string{"org", "space"}, new([]plugin_models.GetSpaceUsers_Model)),
+			Entry("GetOrg org lookup", "GetOrg", "organizations", "org", new(plugin_models.GetOrg_Model)),
+			Entry("GetOrg quota", "GetOrg", "organization quota", "org", new(plugin_models.GetOrg_Model)),
+			Entry("GetOrg spaces", "GetOrg", "spaces", "org", new(plugin_models.GetOrg_Model)),
+			Entry("GetOrg domains", "GetOrg", "domains", "org", new(plugin_models.GetOrg_Model)),
+			Entry("GetOrg space quotas", "GetOrg", "space quotas", "org", new(plugin_models.GetOrg_Model)),
+			Entry("GetSpace space lookup", "GetSpace", "spaces", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace org lookup", "GetSpace", "organization", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace apps", "GetSpace", "applications", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace services", "GetSpace", "instances", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace domains", "GetSpace", "domains", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace quota", "GetSpace", "space quota", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace running groups", "GetSpace", "running groups", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetSpace staging groups", "GetSpace", "staging groups", "space", new(plugin_models.GetSpace_Model)),
+			Entry("GetService", "GetService", "service", "service", new(plugin_models.GetService_Model)),
+		)
 	})
 
 	Describe("serialized config and actor access", func() {
