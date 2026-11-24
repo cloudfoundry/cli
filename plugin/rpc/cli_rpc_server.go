@@ -48,8 +48,9 @@ type CliRpcCmd struct {
 	commandParser  CommandParser
 	commandUI      *ui.UI
 
-	// coreCommandMutex serializes core command runs and guards outputDisabled and
-	// outputBucket: net/rpc serves each plugin connection on its own goroutine.
+	// coreCommandMutex serializes RPC operations using config, actor, or command
+	// output: even Get* calls can refresh tokens and mutate config. Each exported
+	// handler takes the lock once; internal helpers require it to be held.
 	coreCommandMutex sync.Mutex
 }
 
@@ -228,6 +229,7 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return nil
 }
 
+// getActor requires coreCommandMutex to be held by the calling handler.
 func (cmd *CliRpcCmd) getActor() (*v7action.Actor, error) {
 	if cmd.actor != nil {
 		return cmd.actor, nil
@@ -240,6 +242,7 @@ func (cmd *CliRpcCmd) getActor() (*v7action.Actor, error) {
 
 // displayWarnings writes Cloud Controller warnings to stderr, keeping the
 // plugin's stdout free of CLI output (legacy Get* calls printed nothing).
+// The calling handler must hold coreCommandMutex.
 func (cmd *CliRpcCmd) displayWarnings(warnings []string) {
 	if cmd.commandUI != nil {
 		cmd.commandUI.DisplayWarnings(warnings)
@@ -247,6 +250,9 @@ func (cmd *CliRpcCmd) displayWarnings(warnings []string) {
 }
 
 func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	org := cmd.cliConfig.TargetedOrganization()
 	retVal.Name = org.Name
 	retVal.Guid = org.GUID
@@ -254,6 +260,9 @@ func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organizat
 }
 
 func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	space := cmd.cliConfig.TargetedSpace()
 	retVal.Name = space.Name
 	retVal.Guid = space.GUID
@@ -262,6 +271,9 @@ func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) 
 }
 
 func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	username, err := cmd.cliConfig.CurrentUserName()
 	if err != nil {
 		return err
@@ -272,6 +284,9 @@ func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	user, err := cmd.cliConfig.CurrentUser()
 	if err != nil {
 		return err
@@ -282,6 +297,9 @@ func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	user, err := cmd.cliConfig.CurrentUser()
 	if err != nil {
 		*retVal = ""
@@ -293,42 +311,63 @@ func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.AccessToken() != ""
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) IsSSLDisabled(args string, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.SkipSSLValidation()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasOrganization(args string, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.HasTargetedOrganization()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.HasTargetedSpace()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.Target()
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.Target() != ""
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) ApiVersion(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.APIVersion()
 
 	return nil
@@ -341,12 +380,18 @@ func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	*retVal = cmd.cliConfig.ConfigFile.DopplerEndpoint
 
 	return nil
 }
 
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	if cmd.actor == nil {
 		*retVal = cmd.cliConfig.AccessToken()
 		return nil
@@ -374,6 +419,9 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -465,6 +513,9 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -490,6 +541,9 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -508,6 +562,9 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -531,6 +588,9 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -554,6 +614,9 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -595,6 +658,9 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -638,6 +704,9 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -689,6 +758,9 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err
@@ -780,6 +852,9 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 }
 
 func (cmd *CliRpcCmd) GetService(serviceInstanceName string, retVal *plugin_models.GetService_Model) error {
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
 	actor, err := cmd.getActor()
 	if err != nil {
 		return err

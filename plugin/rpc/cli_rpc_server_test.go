@@ -1744,6 +1744,167 @@ var _ = Describe("Server", func() {
 			})
 		})
 	})
+
+	Describe("serialized config and actor access", func() {
+		var (
+			config         *configv3.Config
+			parser         *rpcfakes.FakeCommandParser
+			service        *CliRpcService
+			connection     *rpc.Client
+			commandEntered chan struct{}
+			releaseCommand chan struct{}
+			unblockCommand func()
+			fakeUAAClient  *v7actionfakes.FakeUAAClient
+		)
+
+		BeforeEach(func() {
+			config = testconfig.NewConfigWithDefaults()
+			config.ConfigFile.ConfigVersion = configv3.CurrentConfigVersion
+			config.ConfigFile.Target = "https://initial.example.com"
+			config.ConfigFile.AccessToken = ""
+			config.ConfigFile.RefreshToken = "old-refresh-token"
+			parser = new(rpcfakes.FakeCommandParser)
+			fakeUAAClient = new(v7actionfakes.FakeUAAClient)
+			commandEntered = make(chan struct{})
+			releaseCommand = make(chan struct{})
+			var once sync.Once
+			unblockCommand = func() { once.Do(func() { close(releaseCommand) }) }
+			parser.ParseCommandFromArgsStub = func(_ *ui.UI, _ []string) (int, error) {
+				close(commandEntered)
+				<-releaseCommand
+				config.ConfigFile.Target = "https://updated.example.com"
+				return 0, nil
+			}
+			var err error
+			service, err = NewRpcService(config, rpc.NewServer(), nil, parser, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(service.Start()).To(Succeed())
+			DeferCleanup(service.Stop)
+			connection, err = rpc.Dial("tcp", "127.0.0.1:"+service.Port())
+			Expect(err).ToNot(HaveOccurred())
+			DeferCleanup(connection.Close)
+			DeferCleanup(unblockCommand)
+		})
+
+		DescribeTable("waits for a core command before reading config or actor state",
+			func(method string, args interface{}, result interface{}, expectedError error) {
+				var success bool
+				command := connection.Go("CliRpcCmd.CallCoreCommand", []string{"target"}, &success, nil)
+				commandFinished := make(chan struct{})
+				go func() {
+					<-command.Done
+					close(commandFinished)
+				}()
+				DeferCleanup(func() {
+					unblockCommand()
+					Eventually(commandFinished).Should(BeClosed())
+				})
+				Eventually(commandEntered).Should(BeClosed())
+
+				read := connection.Go("CliRpcCmd."+method, args, result, nil)
+				Consistently(read.Done, 100*time.Millisecond).ShouldNot(Receive())
+
+				unblockCommand()
+				Eventually(commandFinished).Should(BeClosed())
+				Expect(command.Error).ToNot(HaveOccurred())
+				Eventually(read.Done).Should(Receive())
+				if expectedError == nil {
+					Expect(read.Error).ToNot(HaveOccurred())
+				} else {
+					Expect(read.Error).To(MatchError(expectedError.Error()))
+				}
+				if method == "ApiEndpoint" {
+					Expect(result).To(HaveValue(Equal("https://updated.example.com")))
+				}
+			},
+			Entry("current org", "GetCurrentOrg", "", new(plugin_models.Organization), nil),
+			Entry("current space", "GetCurrentSpace", "", new(plugin_models.Space), nil),
+			Entry("username", "Username", "", new(string), nil),
+			Entry("user guid", "UserGuid", "", new(string), nil),
+			Entry("user email", "UserEmail", "", new(string), nil),
+			Entry("login state", "IsLoggedIn", "", new(bool), nil),
+			Entry("SSL validation", "IsSSLDisabled", "", new(bool), nil),
+			Entry("org state", "HasOrganization", "", new(bool), nil),
+			Entry("space state", "HasSpace", "", new(bool), nil),
+			Entry("API endpoint", "ApiEndpoint", "", new(string), nil),
+			Entry("API state", "HasAPIEndpoint", "", new(bool), nil),
+			Entry("API version", "ApiVersion", "", new(string), nil),
+			Entry("doppler endpoint", "DopplerEndpoint", "", new(string), nil),
+			Entry("stored access token", "AccessToken", "", new(string), nil),
+			Entry("app", "GetApp", "app", new(plugin_models.GetAppModel), ErrActorUnavailable),
+			Entry("apps", "GetApps", "", new([]plugin_models.GetAppsModel), ErrActorUnavailable),
+			Entry("orgs", "GetOrgs", "", new([]plugin_models.GetOrgs_Model), ErrActorUnavailable),
+			Entry("spaces", "GetSpaces", "", new([]plugin_models.GetSpaces_Model), ErrActorUnavailable),
+			Entry("services", "GetServices", "", new([]plugin_models.GetServices_Model), ErrActorUnavailable),
+			Entry("org users", "GetOrgUsers", []string{"org"}, new([]plugin_models.GetOrgUsers_Model), ErrActorUnavailable),
+			Entry("space users", "GetSpaceUsers", []string{"org", "space"}, new([]plugin_models.GetSpaceUsers_Model), ErrActorUnavailable),
+			Entry("org", "GetOrg", "org", new(plugin_models.GetOrg_Model), ErrActorUnavailable),
+			Entry("space", "GetSpace", "space", new(plugin_models.GetSpace_Model), ErrActorUnavailable),
+			Entry("service", "GetService", "service", new(plugin_models.GetService_Model), ErrActorUnavailable),
+		)
+
+		It("keeps a token refresh and its config write ahead of a core command", func() {
+			// Use a real actor so refreshing mutates and persists the shared config.
+			actor := v7action.NewActor(nil, config, nil, fakeUAAClient, nil, fakeclock.NewFakeClock(time.Now()))
+			refreshService, err := NewRpcService(config, rpc.NewServer(), actor, parser, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(refreshService.Start()).To(Succeed())
+			DeferCleanup(refreshService.Stop)
+			refreshConnection, err := rpc.Dial("tcp", "127.0.0.1:"+refreshService.Port())
+			Expect(err).ToNot(HaveOccurred())
+			DeferCleanup(refreshConnection.Close)
+
+			refreshEntered := make(chan struct{})
+			releaseRefresh := make(chan struct{})
+			var once sync.Once
+			unblockRefresh := func() { once.Do(func() { close(releaseRefresh) }) }
+			DeferCleanup(unblockRefresh)
+			fakeUAAClient.RefreshAccessTokenStub = func(string) (uaa.RefreshedTokens, error) {
+				close(refreshEntered)
+				<-releaseRefresh
+				return uaa.RefreshedTokens{AccessToken: "new-token", RefreshToken: "new-refresh-token", Type: "bearer"}, nil
+			}
+			parser.ParseCommandFromArgsStub = func(_ *ui.UI, _ []string) (int, error) {
+				close(commandEntered)
+				return 0, config.WriteConfig()
+			}
+
+			var token string
+			refresh := refreshConnection.Go("CliRpcCmd.AccessToken", "", &token, nil)
+			refreshFinished := make(chan struct{})
+			go func() {
+				<-refresh.Done
+				close(refreshFinished)
+			}()
+			DeferCleanup(func() {
+				unblockRefresh()
+				Eventually(refreshFinished).Should(BeClosed())
+			})
+			Eventually(refreshEntered).Should(BeClosed())
+			var success bool
+			command := refreshConnection.Go("CliRpcCmd.CallCoreCommand", []string{"target"}, &success, nil)
+			commandFinished := make(chan struct{})
+			go func() {
+				<-command.Done
+				close(commandFinished)
+			}()
+			DeferCleanup(func() {
+				unblockRefresh()
+				Eventually(commandFinished).Should(BeClosed())
+			})
+			Consistently(commandEntered, 100*time.Millisecond).ShouldNot(BeClosed())
+			unblockRefresh()
+			Eventually(refreshFinished).Should(BeClosed())
+			Expect(refresh.Error).ToNot(HaveOccurred())
+			Eventually(commandFinished).Should(BeClosed())
+			Expect(command.Error).ToNot(HaveOccurred())
+			Expect(token).To(Equal("bearer new-token"))
+			persisted, err := configv3.LoadConfig()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer new-token"))
+			Expect(persisted.ConfigFile.RefreshToken).To(Equal("new-refresh-token"))
+		})
+	})
 })
 
 func pingCli(port string) {
