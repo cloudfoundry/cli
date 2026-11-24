@@ -249,8 +249,12 @@ var _ = Describe("PluginRunner", func() {
 		},
 		Entry("command first", []string{"my-cmd", "-f", "x"}, []string{"my-cmd", "-f", "x"}),
 		Entry("short global flag before the command", []string{"-v", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
-		Entry("long global flags before the command", []string{"--verbose", "-v", "my-cmd", "--opt", "val"}, []string{"my-cmd", "--opt", "val"}),
-		Entry("flags only", []string{"-v", "--help"}, nil),
+		Entry("long version flag before the command", []string{"--version", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
+		Entry("short help flag before the command", []string{"-h", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
+		Entry("long help flag before the command", []string{"--help", "my-cmd", "arg"}, []string{"my-cmd", "arg"}),
+		Entry("combined global flags before the command", []string{"--version", "-v", "-h", "--help", "my-cmd", "--opt", "val"}, []string{"my-cmd", "--opt", "val"}),
+		Entry("global-looking flags after the command are kept", []string{"-v", "my-cmd", "--version", "-h", "--help"}, []string{"my-cmd", "--version", "-h", "--help"}),
+		Entry("flags only", []string{"-v", "--version", "-h", "--help"}, nil),
 		Entry("no arguments", []string{}, nil),
 	)
 })

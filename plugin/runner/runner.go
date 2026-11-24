@@ -130,8 +130,10 @@ func (r *pluginRunner) Run(args []string) error {
 }
 
 // CommandArgs returns the command line starting at the command: leading
-// arguments starting with "-" are global options (which take no values) and are
-// skipped. It returns nil when there is no command.
+// arguments starting with "-" are skipped. This assumes the current global
+// options (-v, --version, -h, --help) take no values. Adding a global option
+// that takes a value requires updating this helper. Arguments after the command
+// are kept unchanged. It returns nil when there is no command.
 func CommandArgs(args []string) []string {
 	for i, arg := range args {
 		if !strings.HasPrefix(arg, "-") {
