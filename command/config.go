@@ -44,6 +44,7 @@ type Config interface {
 	PollingInterval() time.Duration
 	RefreshToken() string
 	RemovePlugin(string)
+	RemovePluginRepository(name string)
 	RequestRetryCount() int
 	RoutingEndpoint() string
 	SetAsyncTimeout(timeout int)

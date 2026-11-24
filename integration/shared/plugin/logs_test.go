@@ -40,7 +40,7 @@ var _ = Describe("logs", func() {
 					appName, "-p", appDir, "-b", "staticfile_buildpack")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say("Downloading app package..."))
-				Expect(session).To(Say("Creating app"))
+				Expect(session).To(Say("Uploading complete"))
 			})
 		})
 	})

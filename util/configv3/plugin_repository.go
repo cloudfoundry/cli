@@ -26,6 +26,18 @@ func (config *Config) AddPluginRepository(name string, url string) {
 		PluginRepository{Name: name, URL: url})
 }
 
+// RemovePluginRepository removes the repository with the given name (exact match)
+// from the plugin config.
+func (config *Config) RemovePluginRepository(name string) {
+	remaining := []PluginRepository{}
+	for _, repository := range config.ConfigFile.PluginRepositories {
+		if repository.Name != name {
+			remaining = append(remaining, repository)
+		}
+	}
+	config.ConfigFile.PluginRepositories = remaining
+}
+
 // PluginRepositories returns the currently configured plugin repositories from the
 // .cf/config.json.
 func (config *Config) PluginRepositories() []PluginRepository {

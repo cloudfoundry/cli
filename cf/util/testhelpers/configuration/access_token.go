@@ -28,3 +28,17 @@ func BuildTokenString(expiration time.Time) string {
 	tokenBytes, _ := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
 	return string(tokenBytes)
 }
+
+// BuildTokenStringWithUserInfo builds a JWT with user information for testing.
+func BuildTokenStringWithUserInfo(userGUID, username, email, origin string) string {
+	claims := jwtv5.MapClaims{
+		"exp":       jwtv5.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		"user_id":   userGUID,
+		"user_name": username,
+		"email":     email,
+		"origin":    origin,
+	}
+	token := jwtv5.NewWithClaims(jwtv5.SigningMethodNone, claims)
+	tokenString, _ := token.SignedString(jwtv5.UnsafeAllowNoneSignatureType)
+	return "bearer " + tokenString
+}

@@ -313,7 +313,7 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 			AppProtocols:        appProtocols,
 			AppPorts:            appPorts,
 			SpaceName:           spaceNamesByGUID[route.SpaceGUID],
-			DomainName:          getDomainName(route.URL, route.Host, route.Path, route.Port),
+			DomainName:          DomainNameFromRouteURL(route.URL, route.Host, route.Path, route.Port),
 			ServiceInstanceName: serviceInstanceNameByRouteGUID[route.GUID],
 		})
 	}
@@ -478,7 +478,9 @@ func (actor Actor) GetRoutesByDomain(domainGUID, hostname, path string) ([]resou
 	return routes, Warnings(warnings), err
 }
 
-func getDomainName(fullURL, host, path string, port int) string {
+// DomainNameFromRouteURL extracts the domain name from a route URL by removing
+// the route's host prefix, path suffix and port suffix.
+func DomainNameFromRouteURL(fullURL, host, path string, port int) string {
 	domainWithoutHost := strings.TrimPrefix(fullURL, host+".")
 	domainWithoutPath := strings.TrimSuffix(domainWithoutHost, path)
 

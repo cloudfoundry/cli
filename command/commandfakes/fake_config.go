@@ -358,6 +358,11 @@ type FakeConfig struct {
 	removePluginArgsForCall []struct {
 		arg1 string
 	}
+	RemovePluginRepositoryStub        func(string)
+	removePluginRepositoryMutex       sync.RWMutex
+	removePluginRepositoryArgsForCall []struct {
+		arg1 string
+	}
 	RequestRetryCountStub        func() int
 	requestRetryCountMutex       sync.RWMutex
 	requestRetryCountArgsForCall []struct {
@@ -2474,6 +2479,38 @@ func (fake *FakeConfig) RemovePluginArgsForCall(i int) string {
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
 	argsForCall := fake.removePluginArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) RemovePluginRepository(arg1 string) {
+	fake.removePluginRepositoryMutex.Lock()
+	fake.removePluginRepositoryArgsForCall = append(fake.removePluginRepositoryArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.RemovePluginRepositoryStub
+	fake.recordInvocation("RemovePluginRepository", []interface{}{arg1})
+	fake.removePluginRepositoryMutex.Unlock()
+	if stub != nil {
+		fake.RemovePluginRepositoryStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) RemovePluginRepositoryCallCount() int {
+	fake.removePluginRepositoryMutex.RLock()
+	defer fake.removePluginRepositoryMutex.RUnlock()
+	return len(fake.removePluginRepositoryArgsForCall)
+}
+
+func (fake *FakeConfig) RemovePluginRepositoryCalls(stub func(string)) {
+	fake.removePluginRepositoryMutex.Lock()
+	defer fake.removePluginRepositoryMutex.Unlock()
+	fake.RemovePluginRepositoryStub = stub
+}
+
+func (fake *FakeConfig) RemovePluginRepositoryArgsForCall(i int) string {
+	fake.removePluginRepositoryMutex.RLock()
+	defer fake.removePluginRepositoryMutex.RUnlock()
+	argsForCall := fake.removePluginRepositoryArgsForCall[i]
 	return argsForCall.arg1
 }
 

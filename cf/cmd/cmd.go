@@ -23,6 +23,7 @@ import (
 	"code.cloudfoundry.org/cli/v8/cf/trace"
 	"code.cloudfoundry.org/cli/v8/cf/util/spellcheck"
 	"code.cloudfoundry.org/cli/v8/plugin/rpc"
+	"code.cloudfoundry.org/cli/v8/util/configv3"
 
 	netrpc "net/rpc"
 )
@@ -139,7 +140,15 @@ func Main(traceEnv string, args []string) {
 
 	// non core command, try plugin command
 	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, Writer, server)
+
+	// Load configv3.Config for RPC service
+	v3Config, err := configv3.LoadConfig()
+	if err != nil {
+		deps.UI.Say(T("Error loading config: ") + err.Error())
+		os.Exit(1)
+	}
+
+	rpcService, err := rpc.NewRpcService(v3Config, server, nil, nil, nil)
 	if err != nil {
 		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)

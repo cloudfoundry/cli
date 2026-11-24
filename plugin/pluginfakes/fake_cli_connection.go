@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/v8/plugin"
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"github.com/cloudfoundry/go-cfclient/v3/client"
 )
 
 type FakeCliConnection struct {
@@ -43,6 +44,18 @@ type FakeCliConnection struct {
 	}
 	apiVersionReturnsOnCall map[int]struct {
 		result1 string
+		result2 error
+	}
+	CfClientStub        func() (*client.Client, error)
+	cfClientMutex       sync.RWMutex
+	cfClientArgsForCall []struct {
+	}
+	cfClientReturns struct {
+		result1 *client.Client
+		result2 error
+	}
+	cfClientReturnsOnCall map[int]struct {
+		result1 *client.Client
 		result2 error
 	}
 	CliCommandStub        func(...string) ([]string, error)
@@ -511,6 +524,62 @@ func (fake *FakeCliConnection) ApiVersionReturnsOnCall(i int, result1 string, re
 	}
 	fake.apiVersionReturnsOnCall[i] = struct {
 		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) CfClient() (*client.Client, error) {
+	fake.cfClientMutex.Lock()
+	ret, specificReturn := fake.cfClientReturnsOnCall[len(fake.cfClientArgsForCall)]
+	fake.cfClientArgsForCall = append(fake.cfClientArgsForCall, struct {
+	}{})
+	stub := fake.CfClientStub
+	fakeReturns := fake.cfClientReturns
+	fake.recordInvocation("CfClient", []interface{}{})
+	fake.cfClientMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCliConnection) CfClientCallCount() int {
+	fake.cfClientMutex.RLock()
+	defer fake.cfClientMutex.RUnlock()
+	return len(fake.cfClientArgsForCall)
+}
+
+func (fake *FakeCliConnection) CfClientCalls(stub func() (*client.Client, error)) {
+	fake.cfClientMutex.Lock()
+	defer fake.cfClientMutex.Unlock()
+	fake.CfClientStub = stub
+}
+
+func (fake *FakeCliConnection) CfClientReturns(result1 *client.Client, result2 error) {
+	fake.cfClientMutex.Lock()
+	defer fake.cfClientMutex.Unlock()
+	fake.CfClientStub = nil
+	fake.cfClientReturns = struct {
+		result1 *client.Client
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) CfClientReturnsOnCall(i int, result1 *client.Client, result2 error) {
+	fake.cfClientMutex.Lock()
+	defer fake.cfClientMutex.Unlock()
+	fake.CfClientStub = nil
+	if fake.cfClientReturnsOnCall == nil {
+		fake.cfClientReturnsOnCall = make(map[int]struct {
+			result1 *client.Client
+			result2 error
+		})
+	}
+	fake.cfClientReturnsOnCall[i] = struct {
+		result1 *client.Client
 		result2 error
 	}{result1, result2}
 }

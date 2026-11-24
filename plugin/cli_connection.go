@@ -6,9 +6,13 @@ import (
 	"net"
 	"net/rpc"
 	"os"
+	"strings"
 	"time"
 
 	plugin_models "code.cloudfoundry.org/cli/v8/plugin/models"
+	"code.cloudfoundry.org/cli/v8/version"
+	"github.com/cloudfoundry/go-cfclient/v3/client"
+	cfconfig "github.com/cloudfoundry/go-cfclient/v3/config"
 )
 
 type cliConnection struct {
@@ -380,4 +384,66 @@ func (c *cliConnection) GetService(serviceInstance string) (plugin_models.GetSer
 	})
 
 	return result, err
+}
+
+// CfClient returns a go-cfclient v3 client authenticated with the CLI's
+// current access token, refreshed if it was about to expire. The client does
+// not hold a refresh token, so it is only valid until that access token
+// expires (typically minutes). Long-running plugins should call CfClient()
+// again (or AccessToken()) before each batch of work rather than caching the
+// returned client. In install/uninstall callbacks the CLI cannot refresh the
+// token, so the stored token is used as-is.
+func (c *cliConnection) CfClient() (*client.Client, error) {
+	// Get the API endpoint
+	apiEndpoint, err := c.ApiEndpoint()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get API endpoint: %w", err)
+	}
+
+	// Get the access token
+	accessToken, err := c.AccessToken()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get access token: %w", err)
+	}
+
+	// Parse the access token to extract bearer token
+	// AccessToken returns "bearer <token>" format, we need to split it
+	tokenParts := strings.SplitN(accessToken, " ", 2)
+	var token string
+	if len(tokenParts) == 2 {
+		token = tokenParts[1]
+	} else {
+		token = accessToken
+	}
+
+	// Check if SSL validation is disabled
+	skipSSL, err := c.IsSSLDisabled()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check SSL validation: %w", err)
+	}
+
+	// Build config options
+	userAgent := fmt.Sprintf("cf-plugin/%s", version.VersionString())
+	opts := []cfconfig.Option{
+		cfconfig.Token(token, ""),
+		cfconfig.UserAgent(userAgent),
+	}
+
+	if skipSSL {
+		opts = append(opts, cfconfig.SkipTLSValidation())
+	}
+
+	// Create the config
+	cfg, err := cfconfig.New(apiEndpoint, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create CF client config: %w", err)
+	}
+
+	// Create and return the client
+	cfClient, err := client.New(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create CF client: %w", err)
+	}
+
+	return cfClient, nil
 }

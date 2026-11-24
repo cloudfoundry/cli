@@ -24,7 +24,7 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Access Token:", token)
 		fmt.Println("")
 
-		app, err := cliConnection.GetApp("test_app")
+		app, err := cliConnection.GetApp("test_app") //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("err for test_app", err)
 		fmt.Println("test_app is: ", app)
 
@@ -32,17 +32,17 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Has Organization Targeted:", hasOrg)
 		currentOrg, _ := cliConnection.GetCurrentOrg()
 		fmt.Println("Current Org:", currentOrg)
-		org, _ := cliConnection.GetOrg(currentOrg.Name)
+		org, _ := cliConnection.GetOrg(currentOrg.Name) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println(currentOrg.Name, " Org:", org)
-		orgs, _ := cliConnection.GetOrgs()
+		orgs, _ := cliConnection.GetOrgs() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Orgs:", orgs)
 		hasSpace, _ := cliConnection.HasSpace()
 		fmt.Println("Has Space Targeted:", hasSpace)
 		currentSpace, _ := cliConnection.GetCurrentSpace()
 		fmt.Println("Current space:", currentSpace)
-		space, _ := cliConnection.GetSpace(currentSpace.Name)
+		space, _ := cliConnection.GetSpace(currentSpace.Name) //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Space:", space)
-		spaces, _ := cliConnection.GetSpaces()
+		spaces, _ := cliConnection.GetSpaces() //nolint:staticcheck // exercises the deprecated plugin API on purpose
 		fmt.Println("Spaces:", spaces)
 		loggregator, _ := cliConnection.LoggregatorEndpoint()
 		fmt.Println("Loggregator Endpoint:", loggregator)
