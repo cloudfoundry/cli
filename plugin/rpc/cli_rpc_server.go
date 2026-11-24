@@ -95,6 +95,20 @@ func NewRpcService(
 	return rpcService, nil
 }
 
+// WriteConfigIfTokensChanged persists token changes made during a plugin run.
+// It shares the RPC handlers' lock so shutdown cannot race with a token refresh.
+// A token change saves the whole config, matching upstream's persistence policy.
+func (cli *CliRpcService) WriteConfigIfTokensChanged(accessTokenBefore, refreshTokenBefore string) error {
+	cmd := cli.RpcCmd
+	cmd.coreCommandMutex.Lock()
+	defer cmd.coreCommandMutex.Unlock()
+
+	if cmd.cliConfig.AccessToken() == accessTokenBefore && cmd.cliConfig.RefreshToken() == refreshTokenBefore {
+		return nil
+	}
+	return cmd.cliConfig.WriteConfig()
+}
+
 func (cli *CliRpcService) Stop() {
 	close(cli.stopCh)
 	cli.listener.Close()

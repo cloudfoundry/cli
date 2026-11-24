@@ -90,6 +90,31 @@ var _ = Describe("Server", func() {
 		})
 	})
 
+	Describe(".WriteConfigIfTokensChanged", func() {
+		It("skips writing unchanged tokens even when the config path is unwritable", func() {
+			GinkgoT().Setenv("CF_HOME", GinkgoT().TempDir())
+			config := testconfig.NewConfigWithDefaults()
+			config.ConfigFile.AccessToken = "bearer token"
+			config.ConfigFile.RefreshToken = "refresh-token"
+			service, err := NewRpcService(config, rpc.NewServer(), nil, nil, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.MkdirAll(configv3.ConfigFilePath(), 0700)).To(Succeed())
+
+			Expect(service.WriteConfigIfTokensChanged("bearer token", "refresh-token")).To(Succeed())
+		})
+
+		It("returns the write error when changed tokens cannot be persisted", func() {
+			GinkgoT().Setenv("CF_HOME", GinkgoT().TempDir())
+			config := testconfig.NewConfigWithDefaults()
+			config.ConfigFile.AccessToken = "bearer new-token"
+			service, err := NewRpcService(config, rpc.NewServer(), nil, nil, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.MkdirAll(configv3.ConfigFilePath(), 0700)).To(Succeed())
+
+			Expect(service.WriteConfigIfTokensChanged("bearer old-token", config.RefreshToken())).To(HaveOccurred())
+		})
+	})
+
 	Describe(".Start", func() {
 		BeforeEach(func() {
 			rpcService, err = NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)

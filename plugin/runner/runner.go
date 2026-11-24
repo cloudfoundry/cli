@@ -85,10 +85,13 @@ func (r *pluginRunner) Run(args []string) error {
 	if err != nil {
 		return fmt.Errorf("error starting RPC service: %w", err)
 	}
-	// Like core commands, persist the config once the plugin is done, so tokens
-	// refreshed by any RPC call survive. Deferred first, so it runs after Stop.
+	accessTokenAtLaunch := r.config.AccessToken()
+	refreshTokenAtLaunch := r.config.RefreshToken()
+	// Persist wrapper-triggered token refreshes on exit, but do not overwrite
+	// disk edits when the plugin's tokens are unchanged. Deferred first, so it
+	// runs after Stop. Like upstream, a token change still saves the whole config.
 	defer func() {
-		if writeErr := r.config.WriteConfig(); writeErr != nil {
+		if writeErr := rpcService.WriteConfigIfTokensChanged(accessTokenAtLaunch, refreshTokenAtLaunch); writeErr != nil {
 			fmt.Fprintf(os.Stderr, "Error writing config: %s", writeErr.Error())
 		}
 	}()

@@ -1,6 +1,12 @@
 package runner_test
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"sync/atomic"
+
 	"code.cloudfoundry.org/cli/v8/plugin/runner"
 	"code.cloudfoundry.org/cli/v8/util/configv3"
 	"code.cloudfoundry.org/cli/v8/util/ui"
@@ -19,7 +25,7 @@ var _ = Describe("PluginRunner", func() {
 	)
 
 	BeforeEach(func() {
-		// Run writes the config on exit; never touch the developer's real ~/.cf
+		// Token persistence must never touch the developer's real ~/.cf.
 		cfHome = GinkgoT().TempDir()
 		GinkgoT().Setenv("CF_HOME", cfHome)
 
@@ -142,25 +148,96 @@ var _ = Describe("PluginRunner", func() {
 		Context("when the plugin exits", func() {
 			BeforeEach(func() {
 				config.ConfigFile.ConfigVersion = configv3.CurrentConfigVersion
-				config.ConfigFile.AccessToken = "bearer token-refreshed-during-plugin-run"
-				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+				config.ConfigFile.Target = ""
+				config.ConfigFile.Locale = "en-US"
+				Expect(config.WriteConfig()).To(Succeed())
+				var err error
+				plugin.Location, err = os.Executable()
+				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("writes the config, even when the plugin fails", func() {
-				err := pluginRunner.Run([]string{"test-command"})
-				Expect(err).To(Equal(runner.ErrFailed))
+			DescribeTable("preserves disk edits when tokens have not changed",
+				func(fail bool) {
+					GinkgoT().Setenv("CF_CLI_RUNNER_TEST_HELPER", "write-locale")
+					pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+					args := []string{"test-command"}
+					if fail {
+						args = append(args, "fail")
+					}
+					err := pluginRunner.Run(args)
+					if fail {
+						Expect(err).To(Equal(runner.ErrFailed))
+					} else {
+						Expect(err).ToNot(HaveOccurred())
+					}
+					persisted, err := configv3.LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(persisted.ConfigFile.Locale).To(Equal("fr-FR"))
+				},
+				Entry("after success", false),
+				Entry("after failure", true),
+			)
 
-				persisted, err := configv3.LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer token-refreshed-during-plugin-run"))
+			DescribeTable("persists tokens refreshed by a Get call's request wrapper",
+				func(accessToken, refreshToken string, fail bool) {
+					GinkgoT().Setenv("CF_CLI_RUNNER_TEST_HELPER", "get-orgs")
+					var refreshes atomic.Int32
+					server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						w.Header().Set("Content-Type", "application/json")
+						switch r.URL.Path {
+						case "/oauth/token":
+							refreshes.Add(1)
+							_ = json.NewEncoder(w).Encode(map[string]string{
+								"access_token": accessToken, "refresh_token": refreshToken, "token_type": "bearer",
+							})
+						case "/v3/organizations":
+							if fail {
+								w.WriteHeader(http.StatusForbidden)
+								_, _ = w.Write([]byte(`{"errors":[{"code":10003,"title":"CF-NotAuthorized","detail":"request failed after refresh"}]}`))
+							} else {
+								_, _ = w.Write([]byte(`{"resources":[],"pagination":{"next":null}}`))
+							}
+						default:
+							w.WriteHeader(http.StatusNotFound)
+						}
+					}))
+					DeferCleanup(server.Close)
+					config.ConfigFile.Target = server.URL
+					config.ConfigFile.UAAEndpoint = server.URL
+					config.ConfigFile.AuthorizationEndpoint = server.URL
+					config.ConfigFile.AccessToken = "bearer old-access-token"
+					config.ConfigFile.RefreshToken = "old-refresh-token"
+					Expect(config.WriteConfig()).To(Succeed())
+					pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+					err := pluginRunner.Run([]string{"test-command"})
+					if fail {
+						Expect(err).To(Equal(runner.ErrFailed))
+					} else {
+						Expect(err).ToNot(HaveOccurred())
+					}
+					Expect(refreshes.Load()).To(Equal(int32(1)))
+					persisted, err := configv3.LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(persisted.ConfigFile.AccessToken).To(Equal("bearer " + accessToken))
+					Expect(persisted.ConfigFile.RefreshToken).To(Equal(refreshToken))
+				},
+				Entry("when both tokens change", "new-access-token", "new-refresh-token", false),
+				Entry("when only the access token changes", "new-access-token", "old-refresh-token", false),
+				Entry("when only the refresh token changes", "old-access-token", "new-refresh-token", false),
+				Entry("when the request fails after refreshing", "new-access-token", "new-refresh-token", true),
+			)
+
+			It("does not create config when plugin launch fails without changing tokens", func() {
+				plugin.Location = "/path/to/nonexistent-plugin"
+				Expect(os.Remove(configv3.ConfigFilePath())).To(Succeed())
+				pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
+				Expect(pluginRunner.Run([]string{"test-command"})).To(Equal(runner.ErrFailed))
+				Expect(configv3.ConfigFilePath()).ToNot(BeAnExistingFile())
 			})
 		})
 
-		// Note: Integration tests with actual plugin binaries would require:
-		// 1. A test plugin binary to be compiled
-		// 2. Proper RPC communication setup
-		// 3. Mock RPC server responses
-		// These are typically done in integration test suites with fixture binaries
+		// The subprocess tests use this test executable as a plugin and local HTTP
+		// servers. CF-backed integration coverage remains in the integration suites.
 	})
 
 	DescribeTable("CommandArgs",
