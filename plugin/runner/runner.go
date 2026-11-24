@@ -157,6 +157,13 @@ func (r *pluginRunner) handleError(passedErr error) error {
 		return nil
 	}
 
+	// A plugin owns its error output. Preserve its exit result so the caller
+	// can fail quietly, while launch/setup errors still receive diagnostics.
+	var exitErr *exec.ExitError
+	if errors.As(passedErr, &exitErr) {
+		return passedErr
+	}
+
 	translatedErr := translatableerror.ConvertToTranslatableError(passedErr)
 	if r.commandUI != nil {
 		r.commandUI.DisplayError(translatedErr)

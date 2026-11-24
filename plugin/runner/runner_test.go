@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"sync/atomic"
 
 	"code.cloudfoundry.org/cli/v8/plugin/runner"
@@ -166,7 +167,8 @@ var _ = Describe("PluginRunner", func() {
 					}
 					err := pluginRunner.Run(args)
 					if fail {
-						Expect(err).To(Equal(runner.ErrFailed))
+						Expect(err).To(BeAssignableToTypeOf(&exec.ExitError{}))
+						Expect(err.(*exec.ExitError).ExitCode()).To(Equal(3))
 					} else {
 						Expect(err).ToNot(HaveOccurred())
 					}
@@ -211,7 +213,8 @@ var _ = Describe("PluginRunner", func() {
 					pluginRunner = runner.NewPluginRunner(config, commandUI, plugin, nil)
 					err := pluginRunner.Run([]string{"test-command"})
 					if fail {
-						Expect(err).To(Equal(runner.ErrFailed))
+						Expect(err).To(BeAssignableToTypeOf(&exec.ExitError{}))
+						Expect(err.(*exec.ExitError).ExitCode()).To(Equal(3))
 					} else {
 						Expect(err).ToNot(HaveOccurred())
 					}

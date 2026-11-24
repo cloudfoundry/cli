@@ -4,8 +4,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 
 	"code.cloudfoundry.org/cli/v8/plugin/runner"
 	"code.cloudfoundry.org/cli/v8/util/command_parser"
@@ -58,7 +60,10 @@ func main() {
 			pluginRunner := runner.NewPluginRunner(config, commandUI, plugin, &p)
 			err = pluginRunner.Run(commandArgs)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())
+				var exitErr *exec.ExitError
+				if !errors.As(err, &exitErr) {
+					fmt.Fprintf(os.Stderr, "Error running plugin: %s\n", err.Error())
+				}
 				exitCode = 1
 			}
 
